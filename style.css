@@ -803,6 +803,7 @@ h3::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-5
     opacity: 0;
     animation: expBubbleRise ease-in-out infinite;
 }
+
 @keyframes expBubbleRise {
     0%   { transform: translateY(0)   scale(0.4); opacity: 0;   }
     15%  { opacity: 0.55; }

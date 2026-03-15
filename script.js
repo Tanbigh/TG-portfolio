@@ -595,7 +595,7 @@ if (isTouchDevice()) {
 // PERFORMANCE LOG
 // ============================================
 window.addEventListener('load', () => {
-    console.log('%c✨ Tanbi Ghosh Portfolio', 'color:#a8cdff;font-size:18px;font-weight:bold;');
+    console.log('%cTanbi Ghosh Portfolio', 'color:#a8cdff;font-size:18px;font-weight:bold;');
     console.log('%cLoaded in ' + performance.now().toFixed(2) + 'ms', 'color:#a8cdff;font-size:12px;');
     console.log('%cContact: ghosh.tanbi@gmail.com', 'color:#8a9ab8;font-size:12px;');
 });

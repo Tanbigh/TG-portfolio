@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -13,491 +12,649 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-    <!-- CURSOR EFFECTS -->
-    <div id="cursorGlow" class="cursor-glow" aria-hidden="true"></div>
-    <div id="cursorSpotlight" class="cursor-spotlight" aria-hidden="true"></div>
+<!-- CURSOR EFFECTS -->
+<div id="cursorGlow" class="cursor-glow" aria-hidden="true"></div>
+<div id="cursorSpotlight" class="cursor-spotlight" aria-hidden="true"></div>
 
-    <!-- LOADING SCREEN -->
-    <div id="loadingScreen" class="loading-screen" role="status" aria-label="Loading portfolio">
-        <div class="loader-content">
+<!-- ═══════════════════════════════════════
+     LOADING SCREEN
+═══════════════════════════════════════ -->
+<div id="loadingScreen" class="loading-screen" role="status" aria-label="Loading portfolio">
+    <div class="loader-bg-grid" aria-hidden="true"></div>
+    <div class="loader-rings" aria-hidden="true">
+        <div class="loader-ring r1"></div>
+        <div class="loader-ring r2"></div>
+        <div class="loader-ring r3"></div>
+    </div>
+    <div class="loader-meteors" aria-hidden="true">
+        <span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span>
+    </div>
+    <div class="loader-content">
+        <div class="loader-logo-wrap">
             <div class="loader-logo" aria-hidden="true">TG</div>
-            <div class="loader-bar-wrap">
-                <div class="loader-bar" id="loaderBar"></div>
-            </div>
-            <p class="loader-text" id="loaderText">Initializing...</p>
+            <div class="loader-logo-glow" aria-hidden="true"></div>
         </div>
-        <div class="loader-particles" aria-hidden="true">
-            <span></span><span></span><span></span><span></span><span></span>
+        <div class="loader-bar-wrap">
+            <div class="loader-bar" id="loaderBar">
+                <div class="loader-bar-shine"></div>
+            </div>
+        </div>
+        <p class="loader-text" id="loaderText">Initializing...</p>
+        <div class="loader-dots" aria-hidden="true">
+            <span></span><span></span><span></span>
         </div>
     </div>
-
-    <!-- FLOATING CONTROLS -->
-    <div class="floating-controls" role="group" aria-label="Accessibility controls">
-        <button class="ctrl-btn" id="themeToggle" aria-label="Toggle light/dark theme" title="Toggle theme">
-            <span class="ctrl-icon theme-icon-dark" aria-hidden="true">☀</span>
-            <span class="ctrl-icon theme-icon-light" style="display:none" aria-hidden="true">☾</span>
-        </button>
-        <button class="ctrl-btn" id="musicToggle" aria-label="Toggle background music" title="Toggle music">
-            <span class="ctrl-icon music-icon-on" aria-hidden="true">♪</span>
-            <span class="ctrl-icon music-icon-off" style="display:none" aria-hidden="true">♩</span>
-        </button>
+    <div class="loader-particles" aria-hidden="true">
+        <span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span>
     </div>
-
-    <!-- Background ambient music -->
-    <audio id="bgMusic" loop preload="none" aria-hidden="true">
-        <source src="assets/ambient.mp3" type="audio/mpeg">
-    </audio>
-
-    <!-- Animated Background -->
-    <div class="bg-animation" aria-hidden="true">
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
+    <div class="loader-corner-deco" aria-hidden="true">
+        <span class="c1"></span><span class="c2"></span>
+        <span class="c3"></span><span class="c4"></span>
     </div>
+</div>
 
-    <!-- Navigation -->
-    <nav role="navigation" aria-label="Main navigation">
-        <div class="nav-container">
-            <div class="nav-logo" aria-label="Tanbi Ghosh">TG</div>
-            <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle mobile menu" aria-expanded="false" aria-controls="navMenu">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-            <ul class="nav-menu" id="navMenu" role="list">
-                <li role="listitem"><a href="#home" class="hl-hover">Home</a></li>
-                <li role="listitem"><a href="#about" class="hl-hover">About</a></li>
-                <li role="listitem"><a href="#experience" class="hl-hover">Experience</a></li>
-                <li role="listitem"><a href="#projects" class="hl-hover">Projects</a></li>
-                <li role="listitem"><a href="#skills" class="hl-hover">Skills</a></li>
-                <li role="listitem"><a href="#achievements" class="hl-hover">Events &amp; Achievements</a></li>
-                <li role="listitem"><a href="#contact" class="hl-hover">Contact</a></li>
-            </ul>
-        </div>
-    </nav>
-
-    <!-- Hero Section -->
-    <section id="home" class="hero" aria-label="Hero introduction">
-        <div class="hero-content">
-            <div class="profile-image-container">
-                <div class="orbit-ring" aria-hidden="true">
-                    <div class="orbit-dot"></div>
-                </div>
-                <img src="assets/profile.jpeg" alt="Tanbi Ghosh - Portfolio Photo" class="profile-image"
-                    id="profileImg" onerror="this.src='assets/profile.svg'" draggable="false" oncontextmenu="return false;">
-            </div>
-            <h1 class="hl-hover">Hello, I'm Tanbi Ghosh</h1>
-            <h2>BCA Student | Developer | Writer | Creative Artist</h2>
-            <p class="hero-location">Kolkata, West Bengal, India</p>
-        </div>
-    </section>
-
-    <!-- About Section -->
-    <section id="about" aria-labelledby="about-heading">
-        <div class="container">
-            <h3 id="about-heading" class="hl-hover">About Me</h3>
-            <div class="card">
-                <p>A high-achieving Bachelor of Computer Applications (BCA) student with a strong academic record and
-                    interdisciplinary interests across computer science, operating systems, machine learning,
-                    humanities, and creative arts.</p>
-                <p>Actively involved in editorial leadership, academic writing, technical internships, institutional
-                    events, and scholarly workshops. Demonstrates intellectual curiosity, organizational responsibility,
-                    and a consistent commitment to academic excellence and collaborative learning.</p>
-
-                <div class="languages-section">
-                    <h4 class="hl-hover section-subheading">Languages Known</h4>
-                    <div class="language-grid">
-                        <div class="language-item">
-                            <span class="language-name">Bengali</span>
-                            <span class="language-level">Native</span>
-                        </div>
-                        <div class="language-item">
-                            <span class="language-name">English</span>
-                            <span class="language-level">Professional</span>
-                        </div>
-                        <div class="language-item">
-                            <span class="language-name">Hindi</span>
-                            <span class="language-level">Professional</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Experience Section -->
-    <section id="experience" aria-labelledby="experience-heading">
-        <div class="container">
-            <h3 id="experience-heading" class="hl-hover">Experience</h3>
-
-            <h4 class="hl-hover section-subheading">Editorial Leadership</h4>
-
-            <div class="card">
-                <h4 class="hl-hover">Deputy Secretary &amp; Editorial Lead</h4>
-                <p><strong>Gyan Ke Bytes — Ashram Campus Official News Magazine</strong></p>
-                <p>Duration: Throughout college tenure (3 years)</p>
-                <p class="card-desc">Chief responsibilities include academic and institutional news writing,
-                    content editing and proofreading, editorial planning, team coordination, and publication design
-                    supervision.</p>
-            </div>
-
-            <div class="card card-mt">
-                <h4 class="hl-hover">OC &amp; Organizer — Campus Tank IEM 2025</h4>
-                <p><strong>Campus Tank 2K25 | IEM Kolkata</strong></p>
-                <p class="card-desc">An exhilarating journey as both an <em>organizer</em> and a <em>student shark</em> at Campus Tank 2K25, IEM's high-energy entrepreneurship arena. Witnessed sharp minds conceptualize groundbreaking startup ideas, strike strategic deals, and embrace the entrepreneurial mindset in a competitive, high-stakes environment.</p>
-                <div class="tag-row">
-                    <span class="tech-tag">Organizer</span>
-                    <span class="tech-tag">Judge</span>
-                    <span class="tech-tag">Student Shark</span>
-                    <span class="tech-tag">Entrepreneurship</span>
-                </div>
-            </div>
-
-            <h4 class="hl-hover section-subheading">Internships</h4>
-            <div class="cards">
-                <div class="card">
-                    <h4 class="hl-hover">Journalism Intern</h4>
-                    <p><strong>NewsTapOne</strong></p>
-                    <p class="card-desc">Content Writing</p>
-                </div>
-                <div class="card">
-                    <h4 class="hl-hover">Campus Ambassador</h4>
-                    <p>SmartED</p>
-                </div>
-                <div class="card">
-                    <h4 class="hl-hover">MERN Stack Development Intern</h4>
-                    <p>Euphoria GenX</p>
-                </div>
-                <div class="card">
-                    <h4 class="hl-hover">Web Development Intern</h4>
-                    <p>ApexPlanet Software Pvt. Ltd.</p>
-                </div>
-                <div class="card">
-                    <h4 class="hl-hover">Web Development Intern</h4>
-                    <p>CodSoft (January Session)</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Projects Section -->
-    <section id="projects" aria-labelledby="projects-heading">
-        <div class="container">
-            <h3 id="projects-heading" class="hl-hover">Projects</h3>
-            <div class="projects-grid">
-
-                <article class="project-card">
-                    <div class="project-icon" aria-hidden="true">⛅</div>
-                    <h4 class="hl-hover">Weather Report Application</h4>
-                    <p>A real-time weather application that provides current weather conditions, forecasts, and detailed meteorological data using API integration.</p>
-                    <div class="project-tech">
-                        <span class="tech-tag">HTML</span>
-                        <span class="tech-tag">CSS</span>
-                        <span class="tech-tag">JavaScript</span>
-                        <span class="tech-tag">API</span>
-                    </div>
-                    <div class="project-links">
-                        <a href="https://tanbigh.github.io/Weather-Dashboard-Data-from-an-API-Using-JavaScript/" target="_blank" rel="noopener noreferrer" class="project-btn" aria-label="View Weather Report Application">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                                <polyline points="15 3 21 3 21 9"></polyline>
-                                <line x1="10" y1="14" x2="21" y2="3"></line>
-                            </svg>
-                            View Project
-                        </a>
-                    </div>
-                </article>
-
-                <article class="project-card">
-                    <div class="project-icon" aria-hidden="true">♟</div>
-                    <h4 class="hl-hover">Offline Chess Game</h4>
-                    <p>A fully functional offline chess game with a clean, interactive board, two-player local gameplay, move validation, and smooth piece animations — no internet required.</p>
-                    <div class="project-tech">
-                        <span class="tech-tag">HTML</span>
-                        <span class="tech-tag">CSS</span>
-                        <span class="tech-tag">JavaScript</span>
-                        <span class="tech-tag">Game Logic</span>
-                    </div>
-                    <div class="project-links">
-                        <a href="https://tanbigh.github.io/Chess-Ofline-Play/" target="_blank" rel="noopener noreferrer" class="project-btn" aria-label="View Offline Chess Game">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                                <polyline points="15 3 21 3 21 9"></polyline>
-                                <line x1="10" y1="14" x2="21" y2="3"></line>
-                            </svg>
-                            View Project
-                        </a>
-                    </div>
-                </article>
-
-                <article class="project-card">
-                    <div class="project-icon" aria-hidden="true">✅</div>
-                    <h4 class="hl-hover">To-Do List Application</h4>
-                    <p>A feature-rich task management application with local storage, priority levels, filtering options, and an intuitive user interface for productivity.</p>
-                    <div class="project-tech">
-                        <span class="tech-tag">HTML</span>
-                        <span class="tech-tag">CSS</span>
-                        <span class="tech-tag">JavaScript</span>
-                        <span class="tech-tag">LocalStorage</span>
-                    </div>
-                    <div class="project-links">
-                        <a href="https://tanbigh.github.io/TG-TO-DO-List-/" target="_blank" rel="noopener noreferrer" class="project-btn" aria-label="View To-Do List Application">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                                <polyline points="15 3 21 3 21 9"></polyline>
-                                <line x1="10" y1="14" x2="21" y2="3"></line>
-                            </svg>
-                            View Project
-                        </a>
-                    </div>
-                </article>
-
-                <article class="project-card">
-                    <div class="project-icon" aria-hidden="true">🎨</div>
-                    <h4 class="hl-hover">Previous Portfolio</h4>
-                    <p>My earlier portfolio website showcasing initial web development skills, creative design approach, and professional presentation of projects and achievements.</p>
-                    <div class="project-tech">
-                        <span class="tech-tag">HTML</span>
-                        <span class="tech-tag">CSS</span>
-                        <span class="tech-tag">JavaScript</span>
-                        <span class="tech-tag">Responsive</span>
-                    </div>
-                    <div class="project-links">
-                        <a href="https://tanbigh.github.io/Tanbi-Ghosh-Profile/" target="_blank" rel="noopener noreferrer" class="project-btn" aria-label="View Previous Portfolio">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                                <polyline points="15 3 21 3 21 9"></polyline>
-                                <line x1="10" y1="14" x2="21" y2="3"></line>
-                            </svg>
-                            View Project
-                        </a>
-                    </div>
-                </article>
-
-            </div>
-        </div>
-    </section>
-
-    <!-- Skills Section -->
-    <section id="skills" aria-labelledby="skills-heading">
-        <div class="container">
-            <h3 id="skills-heading" class="hl-hover">Skills &amp; Expertise</h3>
-            <div class="skills-grid">
-                <div class="skill-category">
-                    <h4 class="hl-hover">Programming Languages</h4>
-                    <span class="skill-tag">C</span>
-                    <span class="skill-tag">C++</span>
-                    <span class="skill-tag">Java</span>
-                    <span class="skill-tag">Python</span>
-                    <span class="skill-tag">HTML</span>
-                    <span class="skill-tag">CSS</span>
-                    <span class="skill-tag">JavaScript</span>
-                </div>
-                <div class="skill-category">
-                    <h4 class="hl-hover">Technical Domains</h4>
-                    <span class="skill-tag">Operating Systems</span>
-                    <span class="skill-tag">Machine Learning</span>
-                    <span class="skill-tag">Web Development</span>
-                    <span class="skill-tag">MERN Stack</span>
-                </div>
-                <div class="skill-category">
-                    <h4 class="hl-hover">Writing &amp; Communication</h4>
-                    <span class="skill-tag">Academic Writing</span>
-                    <span class="skill-tag">Creative Writing</span>
-                    <span class="skill-tag">Content Editing</span>
-                    <span class="skill-tag">Proofreading</span>
-                </div>
-                <div class="skill-category">
-                    <h4 class="hl-hover">Creative Arts</h4>
-                    <span class="skill-tag">Painting</span>
-                    <span class="skill-tag">Singing</span>
-                    <span class="skill-tag">Story Reading</span>
-                    <span class="skill-tag">Story Writing</span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Events & Achievements Section -->
-    <section id="achievements" aria-labelledby="achievements-heading">
-        <div class="container">
-            <h3 id="achievements-heading" class="hl-hover">Events &amp; Achievements</h3>
-
-            <h4 class="hl-hover section-subheading">Competitive Achievements</h4>
-            <div class="timeline" role="list">
-                <div class="timeline-item" role="listitem">
-                    <h4 class="hl-hover">Indian Art Olympiad — Rank Holder</h4>
-                    <p>National Level Art Competition</p>
-                </div>
-                <div class="timeline-item" role="listitem">
-                    <h4 class="hl-hover">District Level Painting Competition — 3rd Runner Up</h4>
-                    <p>Debarati Kalakendra</p>
-                </div>
-                <div class="timeline-item" role="listitem">
-                    <h4 class="hl-hover">IEM Ashram League Chess 2025 — 2nd Runner Up</h4>
-                    <p>Institute Level Chess Championship</p>
-                </div>
-                <div class="timeline-item" role="listitem">
-                    <h4 class="hl-hover">Domes Art League — Top 10</h4>
-                    <p>Regional Art Competition</p>
-                </div>
-            </div>
-
-            <h4 class="hl-hover section-subheading">Academic &amp; Cultural Events</h4>
-            <div class="timeline" role="list">
-                <div class="timeline-item" role="listitem">
-                    <h4 class="hl-hover">OC, Organizer &amp; Judge — Campus Tank 2K25</h4>
-                    <p>Campus Tank 2K25 at IEM — An exhilarating journey as organizer and student shark. Witnessed sharp minds pitch groundbreaking startup ideas, strike strategic deals, and embrace the entrepreneurial mindset in a high-energy competitive arena.</p>
-                </div>
-                <div class="timeline-item" role="listitem">
-                    <h4 class="hl-hover">Technical Support Member</h4>
-                    <p>West Bengal Government Police Recruitment Examination</p>
-                </div>
-                <div class="timeline-item" role="listitem">
-                    <h4 class="hl-hover">Hackathon Participant</h4>
-                    <p>HackArena Hackathon 2025, HACK{0}LUTION 2K25, Escape Room Coding Competition</p>
-                </div>
-                <div class="timeline-item" role="listitem">
-                    <h4 class="hl-hover">Workshop Participant</h4>
-                    <p>Early Brahmi Workshop (CoE IKS), ESI Golden Jubilee Lecture Series, Kolkata Tech Workshop 2025 (IIT Kharagpur)</p>
-                </div>
-                <div class="timeline-item" role="listitem">
-                    <h4 class="hl-hover">Industry Visit</h4>
-                    <p>Grow Ever Steel (India) Pvt. Ltd. — March 7, 2025</p>
-                </div>
-                <div class="timeline-item" role="listitem">
-                    <h4 class="hl-hover">Academic Competitions</h4>
-                    <p>Pragya Quiz — Participant (2024, 2025)</p>
-                </div>
-            </div>
-
-            <h4 class="hl-hover section-subheading">Editorial &amp; Creative Contributions</h4>
-            <div class="timeline" role="list">
-                <div class="timeline-item" role="listitem">
-                    <h4 class="hl-hover">College Annual Magazine 'Horizon and Beyond'</h4>
-                    <p>Writer &amp; Painting Contributor (2024, 2026)</p>
-                </div>
-                <div class="timeline-item" role="listitem">
-                    <h4 class="hl-hover">Wall Magazine Contributor</h4>
-                    <p>2023</p>
-                </div>
-                <div class="timeline-item" role="listitem">
-                    <h4 class="hl-hover">Theatrik Lekhoni 2.0</h4>
-                    <p>Creative Writer</p>
-                </div>
-            </div>
-
-            <div class="core-competencies">
-                <h4 class="competencies-label">Core Competencies</h4>
-                <div class="badges-row">
-                    <span class="achievement-badge">Academic Excellence</span>
-                    <span class="achievement-badge">Creative Arts</span>
-                    <span class="achievement-badge">Editorial Leadership</span>
-                    <span class="achievement-badge">Technical Skills</span>
-                    <span class="achievement-badge">Literary Writing</span>
-                    <span class="achievement-badge">Competitive Events</span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Contact Section -->
-    <section id="contact" aria-labelledby="contact-heading">
-        <div class="container">
-            <h3 id="contact-heading" class="hl-hover">Get In Touch</h3>
-            <div class="contact-info">
-                <h4 class="hl-hover contact-intro">Let's Connect!</h4>
-                <div class="contact-grid">
-
-                    <div class="contact-item">
-                        <div class="contact-icon" aria-hidden="true">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                                <polyline points="22,6 12,13 2,6"></polyline>
-                            </svg>
-                        </div>
-                        <div class="contact-details">
-                            <p class="contact-label">Email</p>
-                            <a href="mailto:ghosh.tanbi@gmail.com" class="email-link hl-hover">ghosh.tanbi@gmail.com</a>
-                        </div>
-                    </div>
-
-                    <div class="contact-item">
-                        <div class="contact-icon" aria-hidden="true">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                            </svg>
-                        </div>
-                        <div class="contact-details">
-                            <p class="contact-label">LinkedIn</p>
-                            <a href="https://www.linkedin.com/in/tanbi-ghosh-333945281" target="_blank" rel="noopener noreferrer" class="hl-hover">TANBI GHOSH</a>
-                        </div>
-                    </div>
-
-                    <div class="contact-item">
-                        <div class="contact-icon" aria-hidden="true">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                            </svg>
-                        </div>
-                        <div class="contact-details">
-                            <p class="contact-label">GitHub</p>
-                            <a href="https://github.com/Tanbigh" target="_blank" rel="noopener noreferrer" class="hl-hover">@Tanbigh</a>
-                        </div>
-                    </div>
-
-                    <div class="contact-item">
-                        <div class="contact-icon" aria-hidden="true">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                            </svg>
-                        </div>
-                        <div class="contact-details">
-                            <p class="contact-label">Twitter/X</p>
-                            <a href="https://x.com/TanbiGhosh" target="_blank" rel="noopener noreferrer" class="hl-hover">@TanbiGhosh</a>
-                        </div>
-                    </div>
-
-                    <div class="contact-item">
-                        <div class="contact-icon" aria-hidden="true">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-                                <line x1="9" y1="7" x2="15" y2="7"></line>
-                                <line x1="9" y1="11" x2="15" y2="11"></line>
-                            </svg>
-                        </div>
-                        <div class="contact-details">
-                            <p class="contact-label">Academia</p>
-                            <a href="https://ciemcal.academia.edu/TANBIGHOSH" target="_blank" rel="noopener noreferrer" class="hl-hover">TANBI GHOSH</a>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="footer" role="contentinfo">
-        <div class="footer-content">
-            <div class="footer-text">
-                <p>&copy; <span id="currentYear"></span> Tanbi Ghosh. All Rights Reserved.</p>
-                <p class="footer-tagline">Crafted with passion and code ✨</p>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Scroll to Top Button -->
-    <button class="scroll-top" id="scrollTopBtn" onclick="scrollToTop()" aria-label="Scroll to top">
-        <span aria-hidden="true">↑</span>
+<!-- FLOATING CONTROLS -->
+<div class="floating-controls" role="group" aria-label="Accessibility controls">
+    <button class="ctrl-btn" id="themeToggle" aria-label="Toggle light/dark theme" title="Toggle theme">
+        <span class="ctrl-icon theme-icon-dark" aria-hidden="true">&#9728;</span>
+        <span class="ctrl-icon theme-icon-light" style="display:none" aria-hidden="true">&#9790;</span>
     </button>
+    <button class="ctrl-btn" id="musicToggle" aria-label="Toggle background music" title="Toggle music">
+        <span class="ctrl-icon music-icon-on" aria-hidden="true">&#9834;</span>
+        <span class="ctrl-icon music-icon-off" style="display:none" aria-hidden="true">&#9833;</span>
+    </button>
+</div>
 
-    <script src="script.js"></script>
+<audio id="bgMusic" loop preload="none" aria-hidden="true">
+    <source src="assets/ambient.mp3" type="audio/mpeg">
+</audio>
+
+<!-- Animated Background -->
+<div class="bg-animation" aria-hidden="true">
+    <span></span><span></span><span></span><span></span>
+</div>
+
+<!-- ═══════════════════════════════════════
+     NAVIGATION
+═══════════════════════════════════════ -->
+<nav role="navigation" aria-label="Main navigation">
+    <div class="nav-container">
+        <div class="nav-logo" aria-label="Tanbi Ghosh">TG</div>
+        <button class="mobile-menu-toggle" id="mobileMenuToggle"
+                aria-label="Toggle mobile menu" aria-expanded="false" aria-controls="navMenu">
+            <span></span><span></span><span></span>
+        </button>
+        <ul class="nav-menu" id="navMenu" role="list">
+            <li role="listitem"><a href="#home" class="hl-hover">Home</a></li>
+            <li role="listitem"><a href="#about" class="hl-hover">About</a></li>
+            <li role="listitem"><a href="#experience" class="hl-hover">Experience</a></li>
+            <li role="listitem"><a href="#projects" class="hl-hover">Projects</a></li>
+            <li role="listitem"><a href="#skills" class="hl-hover">Skills</a></li>
+            <li role="listitem"><a href="#achievements" class="hl-hover">Events &amp; Achievements</a></li>
+            <li role="listitem"><a href="#contact" class="hl-hover">Contact</a></li>
+        </ul>
+    </div>
+</nav>
+
+<!-- ═══════════════════════════════════════
+     HERO SECTION
+═══════════════════════════════════════ -->
+<section id="home" class="hero" aria-label="Hero introduction">
+    <div class="hero-content">
+        <div class="profile-image-container">
+            <!-- Primary orbit ring: blue dot, clockwise -->
+            <div class="orbit-ring" aria-hidden="true">
+                <div class="orbit-dot"></div>
+            </div>
+            <!-- Second orbit ring: gold dot, counter-clockwise, wider -->
+            <div class="orbit-ring orbit-ring-2" aria-hidden="true">
+                <div class="orbit-dot orbit-dot-2"></div>
+            </div>
+            <img src="assets/profile.jpeg"
+                 alt="Tanbi Ghosh - Portfolio Photo"
+                 class="profile-image"
+                 id="profileImg"
+                 onerror="this.src='assets/profile.svg'"
+                 draggable="false"
+                 oncontextmenu="return false;">
+        </div>
+        <h1 class="hl-hover">Hello, I'm Tanbi Ghosh</h1>
+        <h2>BCA Student | Developer | Writer | Creative Artist</h2>
+        <p class="hero-location">Kolkata, West Bengal, India</p>
+    </div>
+</section>
+
+<!-- BUBBLE SECTION DIVIDER: Home to About -->
+<div class="section-bubble-divider" aria-hidden="true">
+    <div class="bubble-divider-inner">
+        <span class="sdiv-bubble b1"></span>
+        <span class="sdiv-bubble b2"></span>
+        <span class="sdiv-bubble b3"></span>
+        <span class="sdiv-bubble b4"></span>
+        <span class="sdiv-bubble b5"></span>
+        <span class="sdiv-bubble b6"></span>
+        <span class="sdiv-bubble b7"></span>
+        <span class="sdiv-bubble b8"></span>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     ABOUT SECTION
+═══════════════════════════════════════ -->
+<section id="about" aria-labelledby="about-heading">
+    <div class="container">
+        <h3 id="about-heading" class="hl-hover">About Me</h3>
+        <div class="card">
+            <p>A high-achieving Bachelor of Computer Applications (BCA) student with a strong academic record and
+                interdisciplinary interests across computer science, operating systems, machine learning,
+                humanities, and creative arts.</p>
+            <p>Actively involved in editorial leadership, academic writing, technical internships, institutional
+                events, and scholarly workshops. Demonstrates intellectual curiosity, organizational responsibility,
+                and a consistent commitment to academic excellence and collaborative learning.</p>
+            <div class="languages-section">
+                <h4 class="hl-hover section-subheading">Languages Known</h4>
+                <div class="language-grid">
+                    <div class="language-item">
+                        <span class="language-name">Bengali</span>
+                        <span class="language-level">Native</span>
+                    </div>
+                    <div class="language-item">
+                        <span class="language-name">English</span>
+                        <span class="language-level">Professional</span>
+                    </div>
+                    <div class="language-item">
+                        <span class="language-name">Hindi</span>
+                        <span class="language-level">Professional</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     EXPERIENCE SECTION
+═══════════════════════════════════════ -->
+<section id="experience" aria-labelledby="experience-heading">
+    <div class="container">
+        <h3 id="experience-heading" class="hl-hover">Experience</h3>
+
+        <!-- Leadership and Organizer — Vertical Timeline -->
+        <h4 class="hl-hover section-subheading">Leadership and Organizer</h4>
+
+        <div class="exp-timeline" role="list">
+
+            <!-- ENTRY 1: right side -->
+            <div class="exp-entry exp-right" role="listitem">
+                <div class="exp-connector" aria-hidden="true">
+                    <div class="exp-dot"></div>
+                    <div class="exp-line-h exp-line-right"></div>
+                </div>
+                <div class="exp-card" tabindex="0">
+                    <span class="exp-year">2022 &ndash; Present</span>
+                    <h4 class="exp-title">Deputy Secretary &amp; Editorial Lead</h4>
+                    <p class="exp-org">Gyan Ke Bytes &mdash; Ashram Campus Official News Magazine</p>
+                    <p class="exp-desc">Chief responsibilities include academic and institutional news writing,
+                        content editing and proofreading, editorial planning, team coordination, and
+                        publication design supervision.</p>
+                    <p class="exp-skills-label">Skills: <span>Content Writing, Team Management</span></p>
+                    <div class="tag-row">
+                        <span class="tech-tag">Editorial</span>
+                        <span class="tech-tag">Leadership</span>
+                        <span class="tech-tag">Publishing</span>
+                    </div>
+                    <button class="exp-bubble-btn" aria-label="Deputy Secretary role details">
+                        <span class="bubble-text">View Role</span>
+                        <span class="bubble-ring r1"></span>
+                        <span class="bubble-ring r2"></span>
+                        <span class="bubble-ring r3"></span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ENTRY 2: left side -->
+            <div class="exp-entry exp-left" role="listitem">
+                <div class="exp-connector" aria-hidden="true">
+                    <div class="exp-dot"></div>
+                    <div class="exp-line-h exp-line-left"></div>
+                </div>
+                <div class="exp-card" tabindex="0">
+                    <span class="exp-year">2025</span>
+                    <h4 class="exp-title">OC &amp; Organizer &mdash; Campus Tank IEM 2025</h4>
+                    <p class="exp-org">Campus Tank 2K25 | IEM Kolkata</p>
+                    <p class="exp-desc">An exhilarating journey as both an organizer and a student shark at
+                        Campus Tank 2K25, IEM's high-energy entrepreneurship arena. Witnessed sharp minds
+                        conceptualize groundbreaking startup ideas, strike strategic deals, and embrace the
+                        entrepreneurial mindset in a competitive, high-stakes environment.</p>
+                    <div class="tag-row">
+                        <span class="tech-tag">Organizer</span>
+                        <span class="tech-tag">Judge</span>
+                        <span class="tech-tag">Student Shark</span>
+                        <span class="tech-tag">Entrepreneurship</span>
+                    </div>
+                    <button class="exp-bubble-btn" aria-label="Campus Tank role details">
+                        <span class="bubble-text">View Role</span>
+                        <span class="bubble-ring r1"></span>
+                        <span class="bubble-ring r2"></span>
+                        <span class="bubble-ring r3"></span>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Internships -->
+        <h4 class="hl-hover section-subheading">Internships</h4>
+        <div class="cards">
+            <div class="card">
+                <h4 class="hl-hover">Journalism Intern</h4>
+                <p><strong>NewsTapOne</strong></p>
+                <p class="card-desc">Content Writing</p>
+            </div>
+            <div class="card">
+                <h4 class="hl-hover">Campus Ambassador</h4>
+                <p>SmartED</p>
+            </div>
+            <div class="card">
+                <h4 class="hl-hover">MERN Stack Development Intern</h4>
+                <p>Euphoria GenX</p>
+            </div>
+            <div class="card">
+                <h4 class="hl-hover">Web Development Intern</h4>
+                <p>ApexPlanet Software Pvt. Ltd.</p>
+            </div>
+            <div class="card">
+                <h4 class="hl-hover">Web Development Intern</h4>
+                <p>CodSoft (January Session)</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     PROJECTS SECTION
+═══════════════════════════════════════ -->
+<section id="projects" aria-labelledby="projects-heading">
+    <div class="container">
+        <h3 id="projects-heading" class="hl-hover">Projects</h3>
+        <div class="projects-grid">
+
+            <article class="project-card">
+                <div class="project-icon" aria-hidden="true">&#9925;</div>
+                <h4 class="hl-hover">Weather Report Application</h4>
+                <p>A real-time weather application that provides current weather conditions, forecasts,
+                    and detailed meteorological data using API integration.</p>
+                <div class="project-tech">
+                    <span class="tech-tag">HTML</span>
+                    <span class="tech-tag">CSS</span>
+                    <span class="tech-tag">JavaScript</span>
+                    <span class="tech-tag">API</span>
+                </div>
+                <div class="project-links">
+                    <a href="https://tanbigh.github.io/Weather-Dashboard-Data-from-an-API-Using-JavaScript/"
+                       target="_blank" rel="noopener noreferrer" class="project-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                            <polyline points="15 3 21 3 21 9"></polyline>
+                            <line x1="10" y1="14" x2="21" y2="3"></line>
+                        </svg>
+                        View Project
+                    </a>
+                </div>
+            </article>
+
+            <article class="project-card">
+                <div class="project-icon" aria-hidden="true">&#9820;</div>
+                <h4 class="hl-hover">Offline Chess Game</h4>
+                <p>A fully functional offline chess game with a clean, interactive board, two-player
+                    local gameplay, move validation, and smooth piece animations — no internet required.</p>
+                <div class="project-tech">
+                    <span class="tech-tag">HTML</span>
+                    <span class="tech-tag">CSS</span>
+                    <span class="tech-tag">JavaScript</span>
+                    <span class="tech-tag">Game Logic</span>
+                </div>
+                <div class="project-links">
+                    <a href="https://tanbigh.github.io/Chess-Ofline-Play/"
+                       target="_blank" rel="noopener noreferrer" class="project-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                            <polyline points="15 3 21 3 21 9"></polyline>
+                            <line x1="10" y1="14" x2="21" y2="3"></line>
+                        </svg>
+                        View Project
+                    </a>
+                </div>
+            </article>
+
+            <article class="project-card">
+                <div class="project-icon" aria-hidden="true">&#9989;</div>
+                <h4 class="hl-hover">To-Do List Application</h4>
+                <p>A feature-rich task management application with local storage, priority levels,
+                    filtering options, and an intuitive user interface for productivity.</p>
+                <div class="project-tech">
+                    <span class="tech-tag">HTML</span>
+                    <span class="tech-tag">CSS</span>
+                    <span class="tech-tag">JavaScript</span>
+                    <span class="tech-tag">LocalStorage</span>
+                </div>
+                <div class="project-links">
+                    <a href="https://tanbigh.github.io/TG-TO-DO-List-/"
+                       target="_blank" rel="noopener noreferrer" class="project-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                            <polyline points="15 3 21 3 21 9"></polyline>
+                            <line x1="10" y1="14" x2="21" y2="3"></line>
+                        </svg>
+                        View Project
+                    </a>
+                </div>
+            </article>
+
+            <article class="project-card">
+                <div class="project-icon" aria-hidden="true">&#127912;</div>
+                <h4 class="hl-hover">Previous Portfolio</h4>
+                <p>My earlier portfolio website showcasing initial web development skills, creative
+                    design approach, and professional presentation of projects and achievements.</p>
+                <div class="project-tech">
+                    <span class="tech-tag">HTML</span>
+                    <span class="tech-tag">CSS</span>
+                    <span class="tech-tag">JavaScript</span>
+                    <span class="tech-tag">Responsive</span>
+                </div>
+                <div class="project-links">
+                    <a href="https://tanbigh.github.io/Tanbi-Ghosh-Profile/"
+                       target="_blank" rel="noopener noreferrer" class="project-btn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                            <polyline points="15 3 21 3 21 9"></polyline>
+                            <line x1="10" y1="14" x2="21" y2="3"></line>
+                        </svg>
+                        View Project
+                    </a>
+                </div>
+            </article>
+
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     SKILLS SECTION
+═══════════════════════════════════════ -->
+<section id="skills" aria-labelledby="skills-heading">
+    <div class="container">
+        <h3 id="skills-heading" class="hl-hover">Skills &amp; Expertise</h3>
+        <div class="skills-grid">
+            <div class="skill-category">
+                <h4 class="hl-hover">Programming Languages</h4>
+                <span class="skill-tag">C</span>
+                <span class="skill-tag">C++</span>
+                <span class="skill-tag">Java</span>
+                <span class="skill-tag">Python</span>
+                <span class="skill-tag">HTML</span>
+                <span class="skill-tag">CSS</span>
+                <span class="skill-tag">JavaScript</span>
+            </div>
+            <div class="skill-category">
+                <h4 class="hl-hover">Technical Domains</h4>
+                <span class="skill-tag">Operating Systems</span>
+                <span class="skill-tag">Machine Learning</span>
+                <span class="skill-tag">Web Development</span>
+                <span class="skill-tag">MERN Stack</span>
+            </div>
+            <div class="skill-category">
+                <h4 class="hl-hover">Writing &amp; Communication</h4>
+                <span class="skill-tag">Academic Writing</span>
+                <span class="skill-tag">Creative Writing</span>
+                <span class="skill-tag">Content Editing</span>
+                <span class="skill-tag">Proofreading</span>
+            </div>
+            <div class="skill-category">
+                <h4 class="hl-hover">Creative Arts</h4>
+                <span class="skill-tag">Painting</span>
+                <span class="skill-tag">Singing</span>
+                <span class="skill-tag">Story Reading</span>
+                <span class="skill-tag">Story Writing</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     EVENTS & ACHIEVEMENTS SECTION
+═══════════════════════════════════════ -->
+<section id="achievements" aria-labelledby="achievements-heading">
+    <div class="container">
+        <h3 id="achievements-heading" class="hl-hover">Events &amp; Achievements</h3>
+
+        <h4 class="hl-hover section-subheading">Competitive Achievements</h4>
+        <div class="timeline" role="list">
+            <div class="timeline-item" role="listitem">
+                <h4 class="hl-hover">Indian Art Olympiad &mdash; Rank Holder</h4>
+                <p>National Level Art Competition</p>
+            </div>
+            <div class="timeline-item" role="listitem">
+                <h4 class="hl-hover">District Level Painting Competition &mdash; 3rd Runner Up</h4>
+                <p>Debarati Kalakendra</p>
+            </div>
+            <div class="timeline-item" role="listitem">
+                <h4 class="hl-hover">IEM Ashram League Chess 2025 &mdash; 2nd Runner Up</h4>
+                <p>Institute Level Chess Championship</p>
+            </div>
+            <div class="timeline-item" role="listitem">
+                <h4 class="hl-hover">Domes Art League &mdash; Top 10</h4>
+                <p>Regional Art Competition</p>
+            </div>
+        </div>
+
+        <h4 class="hl-hover section-subheading">Academic &amp; Cultural Events</h4>
+        <div class="timeline" role="list">
+            <div class="timeline-item" role="listitem">
+                <h4 class="hl-hover">OC, Organizer &amp; Judge &mdash; Campus Tank 2K25</h4>
+                <p>Campus Tank 2K25 at IEM &mdash; An exhilarating journey as organizer and student shark.</p>
+            </div>
+            <div class="timeline-item" role="listitem">
+                <h4 class="hl-hover">Technical Support Member</h4>
+                <p>West Bengal Government Police Recruitment Examination</p>
+            </div>
+            <div class="timeline-item" role="listitem">
+                <h4 class="hl-hover">Hackathon Participant</h4>
+                <p>HackArena Hackathon 2025, HACK{0}LUTION 2K25, Escape Room Coding Competition</p>
+            </div>
+            <div class="timeline-item" role="listitem">
+                <h4 class="hl-hover">Workshop Participant</h4>
+                <p>Early Brahmi Workshop (CoE IKS), ESI Golden Jubilee Lecture Series,
+                    Kolkata Tech Workshop 2025 (IIT Kharagpur)</p>
+            </div>
+            <div class="timeline-item" role="listitem">
+                <h4 class="hl-hover">Industry Visit</h4>
+                <p>Grow Ever Steel (India) Pvt. Ltd. &mdash; March 7, 2025</p>
+            </div>
+            <div class="timeline-item" role="listitem">
+                <h4 class="hl-hover">Academic Competitions</h4>
+                <p>Pragya Quiz &mdash; Participant (2024, 2025)</p>
+            </div>
+        </div>
+
+        <h4 class="hl-hover section-subheading">Editorial &amp; Creative Contributions</h4>
+        <div class="timeline" role="list">
+            <div class="timeline-item" role="listitem">
+                <h4 class="hl-hover">College Annual Magazine &lsquo;Horizon and Beyond&rsquo;</h4>
+                <p>Writer &amp; Painting Contributor (2024, 2026)</p>
+            </div>
+            <div class="timeline-item" role="listitem">
+                <h4 class="hl-hover">Wall Magazine Contributor</h4>
+                <p>2023</p>
+            </div>
+            <div class="timeline-item" role="listitem">
+                <h4 class="hl-hover">Theatrik Lekhoni 2.0</h4>
+                <p>Creative Writer</p>
+            </div>
+        </div>
+
+        <div class="core-competencies">
+            <h4 class="competencies-label">Core Competencies</h4>
+            <div class="badges-row">
+                <span class="achievement-badge">Academic Excellence</span>
+                <span class="achievement-badge">Creative Arts</span>
+                <span class="achievement-badge">Editorial Leadership</span>
+                <span class="achievement-badge">Technical Skills</span>
+                <span class="achievement-badge">Literary Writing</span>
+                <span class="achievement-badge">Competitive Events</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     CONTACT SECTION
+═══════════════════════════════════════ -->
+<section id="contact" aria-labelledby="contact-heading">
+    <div class="container">
+        <h3 id="contact-heading" class="hl-hover">Get In Touch</h3>
+        <div class="contact-wrapper">
+            <p class="contact-tagline">Open to opportunities, collaborations, and conversations.</p>
+            <div class="contact-grid">
+
+                <!-- EMAIL — clean mailto, no obfuscation -->
+                <a href="mailto:ghosh.tanbi@gmail.com" class="contact-item"
+                   aria-label="Send email to ghosh.tanbi@gmail.com">
+                    <div class="contact-icon" aria-hidden="true">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="2">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4
+                                     c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                            <polyline points="22,6 12,13 2,6"></polyline>
+                        </svg>
+                    </div>
+                    <div class="contact-details">
+                        <p class="contact-label">Email</p>
+                        <span class="contact-value">ghosh&#46;tanbi&#64;gmail&#46;com</span>
+                    </div>
+                    <div class="contact-arrow" aria-hidden="true">&rarr;</div>
+                </a>
+
+                <!-- LINKEDIN -->
+                <a href="https://www.linkedin.com/in/tanbi-ghosh-333945281"
+                   target="_blank" rel="noopener noreferrer" class="contact-item"
+                   aria-label="Visit LinkedIn profile">
+                    <div class="contact-icon" aria-hidden="true">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037
+                                     -1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046
+                                     c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286z
+                                     M5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063
+                                     2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064
+                                     2.065zm1.782 13.019H3.555V9h3.564v11.452z
+                                     M22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24
+                                     1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729
+                                     C24 .774 23.2 0 22.222 0h.003z"/>
+                        </svg>
+                    </div>
+                    <div class="contact-details">
+                        <p class="contact-label">LinkedIn</p>
+                        <span class="contact-value">TANBI GHOSH</span>
+                    </div>
+                    <div class="contact-arrow" aria-hidden="true">&rarr;</div>
+                </a>
+
+                <!-- GITHUB -->
+                <a href="https://github.com/Tanbigh"
+                   target="_blank" rel="noopener noreferrer" class="contact-item"
+                   aria-label="Visit GitHub profile">
+                    <div class="contact-icon" aria-hidden="true">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387
+                                     .599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033
+                                     -1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729
+                                     .083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807
+                                     1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467
+                                     -1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303
+                                     -.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266
+                                     1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404
+                                     2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118
+                                     3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479
+                                     5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576
+                                     4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                    </div>
+                    <div class="contact-details">
+                        <p class="contact-label">GitHub</p>
+                        <span class="contact-value">@Tanbigh</span>
+                    </div>
+                    <div class="contact-arrow" aria-hidden="true">&rarr;</div>
+                </a>
+
+                <!-- TWITTER / X -->
+                <a href="https://x.com/TanbiGhosh"
+                   target="_blank" rel="noopener noreferrer" class="contact-item"
+                   aria-label="Visit Twitter/X profile">
+                    <div class="contact-icon" aria-hidden="true">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817
+                                     L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231z
+                                     m-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                        </svg>
+                    </div>
+                    <div class="contact-details">
+                        <p class="contact-label">Twitter / X</p>
+                        <span class="contact-value">@TanbiGhosh</span>
+                    </div>
+                    <div class="contact-arrow" aria-hidden="true">&rarr;</div>
+                </a>
+
+                <!-- ACADEMIA -->
+                <a href="https://ciemcal.academia.edu/TANBIGHOSH"
+                   target="_blank" rel="noopener noreferrer" class="contact-item"
+                   aria-label="Visit Academia profile">
+                    <div class="contact-icon" aria-hidden="true">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="1.8"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                            <line x1="9" y1="7" x2="15" y2="7"></line>
+                            <line x1="9" y1="11" x2="15" y2="11"></line>
+                        </svg>
+                    </div>
+                    <div class="contact-details">
+                        <p class="contact-label">Academia</p>
+                        <span class="contact-value">TANBI GHOSH</span>
+                    </div>
+                    <div class="contact-arrow" aria-hidden="true">&rarr;</div>
+                </a>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════ -->
+<footer class="footer" role="contentinfo">
+    <div class="footer-content">
+        <div class="footer-text">
+            <p>&copy; <span id="currentYear"></span> Tanbi Ghosh. All Rights Reserved.</p>
+            <p class="footer-tagline">Crafted with passion and code &#10024;</p>
+        </div>
+    </div>
+</footer>
+
+<!-- SCROLL TO TOP -->
+<button class="scroll-top" id="scrollTopBtn" onclick="scrollToTop()" aria-label="Scroll to top">
+    <span aria-hidden="true">&#8593;</span>
+</button>
+
+<!-- ═══════════════════════════════════════
+     SCRIPTS — must be last, after all HTML
+═══════════════════════════════════════ -->
+<script src="script.js"></script>
+
 </body>
-
 </html>

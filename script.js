@@ -187,6 +187,34 @@ function updateMusicIcon(playing) {
 }
 
 // ============================================
+// ORCHID ID BUTTON — COPY TO CLIPBOARD
+// ============================================
+const orchidBtn = document.getElementById('orchidCopyBtn');
+if (orchidBtn) {
+    orchidBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const orchidValue = '0009-0003-4428-7162';
+        try {
+            await navigator.clipboard.writeText(orchidValue);
+            // Visual feedback: change button state temporarily
+            const originalHTML = orchidBtn.innerHTML;
+            orchidBtn.style.borderColor = 'var(--accent-primary)';
+            orchidBtn.style.background = 'var(--accent-subtle)';
+            const contactValue = orchidBtn.querySelector('.contact-value');
+            const originalText = contactValue.textContent;
+            contactValue.textContent = '✓ Copied!';
+            setTimeout(() => {
+                contactValue.textContent = originalText;
+                orchidBtn.style.borderColor = '';
+                orchidBtn.style.background = '';
+            }, 2000);
+        } catch (err) {
+            console.error('Failed to copy ORCHID ID:', err);
+        }
+    });
+}
+
+// ============================================
 // CURSOR — non-touch only
 // ============================================
 if (!isTouchDevice()) {

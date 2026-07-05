@@ -3,16 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="description" content="Tanbi Ghosh - BCA Student, Developer, Writer, and Creative Artist">
+
+    <!-- ═══ PRIMARY SEO ═══ -->
+    <title>Tanbi Ghosh | BCA Graduate, Developer &amp; Creative Writer</title>
+    <meta name="description" content="Portfolio of Tanbi Ghosh, a BCA graduate from IEM Kolkata specializing in web development, machine learning, editorial writing, and creative arts.">
+    <meta name="keywords" content="Tanbi Ghosh, BCA graduate, web developer, MERN stack developer, IEM Kolkata, portfolio, creative writer, machine learning">
     <meta name="author" content="Tanbi Ghosh">
-    <meta name="theme-color" content="#05060a">
-    <title>Tanbi Ghosh - Portfolio</title>
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://tanbigh.github.io/">
+
+    <!-- ═══ OPEN GRAPH ═══ -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Tanbi Ghosh | BCA Graduate, Developer & Creative Writer">
+    <meta property="og:description" content="Portfolio of Tanbi Ghosh, a BCA graduate from IEM Kolkata specializing in web development, machine learning, editorial writing, and creative arts.">
+    <meta property="og:url" content="https://tanbigh.github.io/">
+    <meta property="og:image" content="https://tanbigh.github.io/assets/icon-512.png">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="Tanbi Ghosh Portfolio">
+
+    <!-- ═══ TWITTER CARD ═══ -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Tanbi Ghosh | BCA Graduate, Developer & Creative Writer">
+    <meta name="twitter:description" content="Portfolio of Tanbi Ghosh, a BCA graduate from IEM Kolkata specializing in web development, machine learning, editorial writing, and creative arts.">
+    <meta name="twitter:image" content="https://tanbigh.github.io/assets/icon-512.png">
+    <meta name="twitter:site" content="@TanbiGhosh">
+
+    <!-- ═══ THEME / FAVICON ═══ -->
+    <meta name="theme-color" content="#05060a" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#f0f4fb" media="(prefers-color-scheme: light)">
+    <link rel="icon" href="favicon.ico" sizes="any">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/android-chrome-192x192.png">
+    <link rel="manifest" href="site.webmanifest">
+
+    <!-- ═══ FONTS ═══ -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="style.css">
+
+    <!-- ═══ STRUCTURED DATA ═══ -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Tanbi Ghosh",
+      "url": "https://tanbigh.github.io/",
+      "alumniOf": {
+        "@type": "CollegeOrUniversity",
+        "name": "Institute of Engineering and Management (IEM), Kolkata"
+      },
+      "jobTitle": "Developer, Writer, and Creative Artist",
+      "sameAs": [
+        "https://www.linkedin.com/in/tanbi-ghosh-333945281",
+        "https://github.com/Tanbigh",
+        "https://x.com/TanbiGhosh",
+        "https://ciemcal.academia.edu/TANBIGHOSH"
+      ]
+    }
+    </script>
 </head>
 <body>
+
+<a class="skip-link" href="#main-content">Skip to main content</a>
 
 <!-- CURSOR EFFECTS -->
 <div id="cursorGlow" class="cursor-glow" aria-hidden="true"></div>
@@ -58,12 +114,12 @@
 </div>
 
 <!-- FLOATING CONTROLS -->
-<div class="floating-controls" role="group" aria-label="Accessibility controls">
-    <button class="ctrl-btn" id="themeToggle" aria-label="Toggle light/dark theme" title="Toggle theme">
+<div class="floating-controls" role="group" aria-label="Accessibility and preference controls">
+    <button type="button" class="ctrl-btn" id="themeToggle" aria-label="Switch to light theme" aria-pressed="false" title="Toggle theme">
         <span class="ctrl-icon theme-icon-dark" aria-hidden="true">&#9728;</span>
         <span class="ctrl-icon theme-icon-light" style="display:none" aria-hidden="true">&#9790;</span>
     </button>
-    <button class="ctrl-btn" id="musicToggle" aria-label="Toggle background music" title="Toggle music">
+    <button type="button" class="ctrl-btn" id="musicToggle" aria-label="Toggle background music" aria-pressed="false" title="Toggle music">
         <span class="ctrl-icon music-icon-on" aria-hidden="true">&#9834;</span>
         <span class="ctrl-icon music-icon-off" style="display:none" aria-hidden="true">&#9833;</span>
     </button>
@@ -83,8 +139,8 @@
 ═══════════════════════════════════════ -->
 <nav role="navigation" aria-label="Main navigation">
     <div class="nav-container">
-        <div class="nav-logo" aria-label="Tanbi Ghosh">TG</div>
-        <button class="mobile-menu-toggle" id="mobileMenuToggle"
+        <a href="#home" class="nav-logo" aria-label="Tanbi Ghosh — back to top">TG</a>
+        <button type="button" class="mobile-menu-toggle" id="mobileMenuToggle"
                 aria-label="Toggle mobile menu" aria-expanded="false" aria-controls="navMenu">
             <span></span><span></span><span></span>
         </button>
@@ -100,10 +156,12 @@
     </div>
 </nav>
 
+<main id="main-content">
+
 <!-- ═══════════════════════════════════════
      HERO SECTION
 ═══════════════════════════════════════ -->
-<section id="home" class="hero" aria-label="Hero introduction">
+<section id="home" class="hero" aria-label="Introduction">
     <div class="hero-content">
         <div class="profile-image-container">
             <!-- Primary orbit ring: blue dot, clockwise -->
@@ -115,15 +173,16 @@
                 <div class="orbit-dot orbit-dot-2"></div>
             </div>
             <img src="assets/profile.jpeg"
-                 alt="Tanbi Ghosh - Portfolio Photo"
+                 alt="Portrait of Tanbi Ghosh"
                  class="profile-image"
                  id="profileImg"
-                 onerror="this.src='assets/profile.svg'"
-                 draggable="false"
-                 oncontextmenu="return false;">
+                 width="200" height="200"
+                 fetchpriority="high"
+                 onerror="this.onerror=null;this.src='assets/profile.svg'"
+                 draggable="false">
         </div>
         <h1 class="hl-hover">Hello, I'm Tanbi Ghosh</h1>
-        <h2>BCA Student | Developer | Writer | Creative Artist</h2>
+        <h2>BCA Graduate | Developer | Writer | Creative Artist</h2>
         <p class="hero-location">Kolkata, West Bengal, India</p>
     </div>
 </section>
@@ -147,16 +206,25 @@
 ═══════════════════════════════════════ -->
 <section id="about" aria-labelledby="about-heading">
     <div class="container">
-        <h3 id="about-heading" class="hl-hover">About Me</h3>
-        <div class="card">
-            <p>A high-achieving Bachelor of Computer Applications (BCA) student with a strong academic record and
+        <h2 id="about-heading" class="hl-hover">About Me</h2>
+        <div class="card card-static">
+            <p>A high-achieving Bachelor of Computer Applications (BCA) graduate of the Institute of
+                Engineering and Management (IEM), Kolkata, with a strong academic record and
                 interdisciplinary interests across computer science, operating systems, machine learning,
                 humanities, and creative arts.</p>
             <p>Actively involved in editorial leadership, academic writing, technical internships, institutional
                 events, and scholarly workshops. Demonstrates intellectual curiosity, organizational responsibility,
                 and a consistent commitment to academic excellence and collaborative learning.</p>
+            <div class="education-block">
+                <h3 class="hl-hover section-subheading">Education</h3>
+                <div class="education-item">
+                    <p class="education-degree">Bachelor of Computer Applications (BCA)</p>
+                    <p class="education-institute">Institute of Engineering and Management (IEM), Kolkata</p>
+                    <p class="education-year">Graduated 2026</p>
+                </div>
+            </div>
             <div class="languages-section">
-                <h4 class="hl-hover section-subheading">Languages Known</h4>
+                <h3 class="hl-hover section-subheading">Languages Known</h3>
                 <div class="language-grid">
                     <div class="language-item">
                         <span class="language-name">Bengali</span>
@@ -181,10 +249,10 @@
 ═══════════════════════════════════════ -->
 <section id="experience" aria-labelledby="experience-heading">
     <div class="container">
-        <h3 id="experience-heading" class="hl-hover">Experience</h3>
+        <h2 id="experience-heading" class="hl-hover">Experience</h2>
 
         <!-- Leadership and Organizer — Vertical Timeline -->
-        <h4 class="hl-hover section-subheading">Leadership and Organizer</h4>
+        <h3 class="hl-hover section-subheading">Leadership and Organizer</h3>
 
         <div class="exp-timeline" role="list">
 
@@ -207,12 +275,6 @@
                         <span class="tech-tag">Leadership</span>
                         <span class="tech-tag">Publishing</span>
                     </div>
-                    <button class="exp-bubble-btn" aria-label="Deputy Secretary role details">
-                        <span class="bubble-text">View Role</span>
-                        <span class="bubble-ring r1"></span>
-                        <span class="bubble-ring r2"></span>
-                        <span class="bubble-ring r3"></span>
-                    </button>
                 </div>
             </div>
 
@@ -236,19 +298,13 @@
                         <span class="tech-tag">Student Shark</span>
                         <span class="tech-tag">Entrepreneurship</span>
                     </div>
-                    <button class="exp-bubble-btn" aria-label="Campus Tank role details">
-                        <span class="bubble-text">View Role</span>
-                        <span class="bubble-ring r1"></span>
-                        <span class="bubble-ring r2"></span>
-                        <span class="bubble-ring r3"></span>
-                    </button>
                 </div>
             </div>
 
         </div>
 
         <!-- Internships -->
-        <h4 class="hl-hover section-subheading">Internships</h4>
+        <h3 class="hl-hover section-subheading">Internships</h3>
         <div class="cards">
             <div class="card">
                 <h4 class="hl-hover">Journalism Intern</h4>
@@ -280,12 +336,12 @@
 ═══════════════════════════════════════ -->
 <section id="projects" aria-labelledby="projects-heading">
     <div class="container">
-        <h3 id="projects-heading" class="hl-hover">Projects</h3>
+        <h2 id="projects-heading" class="hl-hover">Projects</h2>
         <div class="projects-grid">
 
             <article class="project-card">
                 <div class="project-icon" aria-hidden="true">&#128250;</div>
-                <h4 class="hl-hover">Real-Time Indian Sign Language Recognition &amp; Text Generation System</h4>
+                <h3 class="hl-hover">Real-Time Indian Sign Language Recognition &amp; Text Generation System</h3>
                 <p><strong>Final-Year College Project (Ongoing)</strong> — Computer vision and accessibility-oriented AI system that recognizes Indian Sign Language (ISL) gestures in real time and converts them into English text.</p>
                 <p class="project-card-desc">Developed gesture detection with background noise subtraction and finger-trace optimization. Focused on building a functional prototype to support communication accessibility for people with hearing and speech impairments. Gained hands-on experience in image processing, gesture recognition, real-time inference, model development, debugging, and evaluation.</p>
                 <div class="project-tech">
@@ -299,7 +355,7 @@
 
             <article class="project-card">
                 <div class="project-icon" aria-hidden="true">&#128218;</div>
-                <h4 class="hl-hover">English to Braille Conversion System</h4>
+                <h3 class="hl-hover">English to Braille Conversion System</h3>
                 <p><strong>Ongoing Project</strong> — A text conversion system designed to translate English text into Braille to develop a reading system for visually impaired individuals.</p>
                 <p class="project-card-desc">This project aims to create an accessible solution for converting standard English text into Braille format, supporting the development of inclusive reading technologies for people with visual impairments.</p>
                 <div class="project-tech">
@@ -312,7 +368,7 @@
 
             <article class="project-card">
                 <div class="project-icon" aria-hidden="true">&#9925;</div>
-                <h4 class="hl-hover">Weather Report Application</h4>
+                <h3 class="hl-hover">Weather Report Application</h3>
                 <p>A real-time weather application that provides current weather conditions, forecasts,
                     and detailed meteorological data using API integration.</p>
                 <div class="project-tech">
@@ -330,13 +386,14 @@
                             <line x1="10" y1="14" x2="21" y2="3"></line>
                         </svg>
                         View Project
+                        <span class="visually-hidden"> (opens in a new tab)</span>
                     </a>
                 </div>
             </article>
 
             <article class="project-card">
                 <div class="project-icon" aria-hidden="true">&#9820;</div>
-                <h4 class="hl-hover">Offline Chess Game</h4>
+                <h3 class="hl-hover">Offline Chess Game</h3>
                 <p>A fully functional offline chess game with a clean, interactive board, two-player
                     local gameplay, move validation, and smooth piece animations — no internet required.</p>
                 <div class="project-tech">
@@ -354,13 +411,14 @@
                             <line x1="10" y1="14" x2="21" y2="3"></line>
                         </svg>
                         View Project
+                        <span class="visually-hidden"> (opens in a new tab)</span>
                     </a>
                 </div>
             </article>
 
             <article class="project-card">
                 <div class="project-icon" aria-hidden="true">&#9989;</div>
-                <h4 class="hl-hover">To-Do List Application</h4>
+                <h3 class="hl-hover">To-Do List Application</h3>
                 <p>A feature-rich task management application with local storage, priority levels,
                     filtering options, and an intuitive user interface for productivity.</p>
                 <div class="project-tech">
@@ -378,13 +436,14 @@
                             <line x1="10" y1="14" x2="21" y2="3"></line>
                         </svg>
                         View Project
+                        <span class="visually-hidden"> (opens in a new tab)</span>
                     </a>
                 </div>
             </article>
 
             <article class="project-card">
                 <div class="project-icon" aria-hidden="true">&#127912;</div>
-                <h4 class="hl-hover">Previous Portfolio</h4>
+                <h3 class="hl-hover">Previous Portfolio</h3>
                 <p>My earlier portfolio website showcasing initial web development skills, creative
                     design approach, and professional presentation of projects and achievements.</p>
                 <div class="project-tech">
@@ -402,6 +461,7 @@
                             <line x1="10" y1="14" x2="21" y2="3"></line>
                         </svg>
                         View Project
+                        <span class="visually-hidden"> (opens in a new tab)</span>
                     </a>
                 </div>
             </article>
@@ -415,10 +475,10 @@
 ═══════════════════════════════════════ -->
 <section id="skills" aria-labelledby="skills-heading">
     <div class="container">
-        <h3 id="skills-heading" class="hl-hover">Skills &amp; Expertise</h3>
+        <h2 id="skills-heading" class="hl-hover">Skills &amp; Expertise</h2>
         <div class="skills-grid">
             <div class="skill-category">
-                <h4 class="hl-hover">Programming Languages</h4>
+                <h3 class="hl-hover">Programming Languages</h3>
                 <span class="skill-tag">C</span>
                 <span class="skill-tag">C++</span>
                 <span class="skill-tag">Java</span>
@@ -428,21 +488,21 @@
                 <span class="skill-tag">JavaScript</span>
             </div>
             <div class="skill-category">
-                <h4 class="hl-hover">Technical Domains</h4>
+                <h3 class="hl-hover">Technical Domains</h3>
                 <span class="skill-tag">Operating Systems</span>
                 <span class="skill-tag">Machine Learning</span>
                 <span class="skill-tag">Web Development</span>
                 <span class="skill-tag">MERN Stack</span>
             </div>
             <div class="skill-category">
-                <h4 class="hl-hover">Writing &amp; Communication</h4>
+                <h3 class="hl-hover">Writing &amp; Communication</h3>
                 <span class="skill-tag">Academic Writing</span>
                 <span class="skill-tag">Creative Writing</span>
                 <span class="skill-tag">Content Editing</span>
                 <span class="skill-tag">Proofreading</span>
             </div>
             <div class="skill-category">
-                <h4 class="hl-hover">Creative Arts</h4>
+                <h3 class="hl-hover">Creative Arts</h3>
                 <span class="skill-tag">Painting</span>
                 <span class="skill-tag">Singing</span>
                 <span class="skill-tag">Story Reading</span>
@@ -457,9 +517,9 @@
 ═══════════════════════════════════════ -->
 <section id="achievements" aria-labelledby="achievements-heading">
     <div class="container">
-        <h3 id="achievements-heading" class="hl-hover">Events &amp; Achievements</h3>
+        <h2 id="achievements-heading" class="hl-hover">Events &amp; Achievements</h2>
 
-        <h4 class="hl-hover section-subheading">Competitive Achievements</h4>
+        <h3 class="hl-hover section-subheading">Competitive Achievements</h3>
         <div class="timeline" role="list">
             <div class="timeline-item" role="listitem">
                 <h4 class="hl-hover">Indian Art Olympiad &mdash; Rank Holder</h4>
@@ -479,7 +539,7 @@
             </div>
         </div>
 
-        <h4 class="hl-hover section-subheading">Academic &amp; Cultural Events</h4>
+        <h3 class="hl-hover section-subheading">Academic &amp; Cultural Events</h3>
         <div class="timeline" role="list">
             <div class="timeline-item" role="listitem">
                 <h4 class="hl-hover">OC, Organizer &amp; Judge &mdash; Campus Tank 2K25</h4>
@@ -508,7 +568,7 @@
             </div>
         </div>
 
-        <h4 class="hl-hover section-subheading">Editorial &amp; Creative Contributions</h4>
+        <h3 class="hl-hover section-subheading">Editorial &amp; Creative Contributions</h3>
         <div class="timeline" role="list">
             <div class="timeline-item" role="listitem">
                 <h4 class="hl-hover">College Annual Magazine &lsquo;Horizon and Beyond&rsquo;</h4>
@@ -525,7 +585,7 @@
         </div>
 
         <div class="core-competencies">
-            <h4 class="competencies-label">Core Competencies</h4>
+            <h3 class="competencies-label">Core Competencies</h3>
             <div class="badges-row">
                 <span class="achievement-badge">Academic Excellence</span>
                 <span class="achievement-badge">Creative Arts</span>
@@ -543,13 +603,13 @@
 ═══════════════════════════════════════ -->
 <section id="contact" aria-labelledby="contact-heading">
     <div class="container">
-        <h3 id="contact-heading" class="hl-hover">Get In Touch</h3>
+        <h2 id="contact-heading" class="hl-hover">Get In Touch</h2>
         <div class="contact-wrapper">
             <p class="contact-tagline">Open to opportunities, collaborations, and conversations.</p>
             <div class="contact-grid">
 
                 <!-- EMAIL — clean mailto, no obfuscation -->
-                <a href="mailto:ghosh.tanbi@gmail.com" class="contact-item"
+                <a href="mailto:ghosh.tanbi@gmail.com" class="contact-item contact-item-featured"
                    aria-label="Send email to ghosh.tanbi@gmail.com">
                     <div class="contact-icon" aria-hidden="true">
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
@@ -561,16 +621,16 @@
                     </div>
                     <div class="contact-details">
                         <p class="contact-label">Email</p>
-                        <span class="contact-value">ghosh&#46;tanbi&#64;gmail&#46;com</span>
+                        <span class="contact-value">ghosh.tanbi@gmail.com</span>
                     </div>
                     <div class="contact-arrow" aria-hidden="true">&rarr;</div>
                 </a>
 
                 <!-- ORCHID ID -->
-                <button class="contact-item contact-orchid-btn"
+                <button type="button" class="contact-item contact-orchid-btn"
                         id="orchidCopyBtn"
-                        aria-label="Copy ORCHID ID: 0009-0003-4428-7162"
-                        title="Click to copy ORCHID ID">
+                        aria-label="Copy ORCID iD: 0009-0003-4428-7162"
+                        title="Click to copy ORCID iD">
                     <div class="contact-icon" aria-hidden="true">
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
                              stroke="currentColor" stroke-width="2">
@@ -578,7 +638,7 @@
                         </svg>
                     </div>
                     <div class="contact-details">
-                        <p class="contact-label">ORCHID ID</p>
+                        <p class="contact-label">ORCID iD</p>
                         <span class="contact-value" id="orchidValue">0009-0003-4428-7162</span>
                     </div>
                     <div class="contact-arrow" aria-hidden="true">&rarr;</div>
@@ -587,7 +647,7 @@
                 <!-- LINKEDIN -->
                 <a href="https://www.linkedin.com/in/tanbi-ghosh-333945281"
                    target="_blank" rel="noopener noreferrer" class="contact-item"
-                   aria-label="Visit LinkedIn profile">
+                   aria-label="Visit LinkedIn profile (opens in a new tab)">
                     <div class="contact-icon" aria-hidden="true">
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037
@@ -611,7 +671,7 @@
                 <!-- GITHUB -->
                 <a href="https://github.com/Tanbigh"
                    target="_blank" rel="noopener noreferrer" class="contact-item"
-                   aria-label="Visit GitHub profile">
+                   aria-label="Visit GitHub profile (opens in a new tab)">
                     <div class="contact-icon" aria-hidden="true">
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387
@@ -638,7 +698,7 @@
                 <!-- TWITTER / X -->
                 <a href="https://x.com/TanbiGhosh"
                    target="_blank" rel="noopener noreferrer" class="contact-item"
-                   aria-label="Visit Twitter/X profile">
+                   aria-label="Visit Twitter/X profile (opens in a new tab)">
                     <div class="contact-icon" aria-hidden="true">
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817
@@ -656,7 +716,7 @@
                 <!-- ACADEMIA -->
                 <a href="https://ciemcal.academia.edu/TANBIGHOSH"
                    target="_blank" rel="noopener noreferrer" class="contact-item"
-                   aria-label="Visit Academia profile">
+                   aria-label="Visit Academia profile (opens in a new tab)">
                     <div class="contact-icon" aria-hidden="true">
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
                              stroke="currentColor" stroke-width="1.8"
@@ -679,28 +739,33 @@
     </div>
 </section>
 
+</main>
+
 <!-- ═══════════════════════════════════════
      FOOTER
 ═══════════════════════════════════════ -->
 <footer class="footer" role="contentinfo">
     <div class="footer-content">
         <div class="footer-text">
-            <p>&copy; <span id="currentYear"></span> Tanbi Ghosh. All Rights Reserved.</p>
+            <p>&copy; <span id="currentYear">2026</span> Tanbi Ghosh. All Rights Reserved.</p>
             <p class="footer-tagline">Crafted with passion and code &#10024;</p>
         </div>
     </div>
 </footer>
 
 <!-- SCROLL TO TOP -->
-<button class="scroll-top" id="scrollTopBtn" onclick="scrollToTop()" aria-label="Scroll to top">
+<button type="button" class="scroll-top" id="scrollTopBtn" onclick="scrollToTop()" aria-label="Scroll to top">
     <span aria-hidden="true">&#8593;</span>
 </button>
 
+<noscript>
+    <style>.loading-screen{display:none !important;} section{opacity:1 !important;}</style>
+</noscript>
 
 <!-- ═══════════════════════════════════════
      SCRIPTS — must be last, after all HTML
 ═══════════════════════════════════════ -->
-<script src="script.js"></script>
+<script src="script.js" defer></script>
 
 </body>
 </html>

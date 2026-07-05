@@ -12,18 +12,6 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 window.scrollTo(0, 0);
 document.addEventListener('DOMContentLoaded', () => window.scrollTo({ top: 0, behavior: 'instant' }));
 
-// ============================================
-// SECURITY
-// ============================================
-document.addEventListener('contextmenu', e => { e.preventDefault(); return false; });
-document.addEventListener('keydown', e => {
-    if (e.key === 'F12') { e.preventDefault(); return false; }
-    if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) { e.preventDefault(); return false; }
-    if (e.ctrlKey && (e.key === 'u' || e.key === 's')) { e.preventDefault(); return false; }
-});
-document.addEventListener('selectstart', e => { if (e.target.tagName === 'IMG') { e.preventDefault(); return false; } });
-document.addEventListener('dragstart', e => { if (e.target.tagName === 'IMG') { e.preventDefault(); return false; } });
-
 document.addEventListener('visibilitychange', () => {
     const state = document.hidden ? 'paused' : 'running';
     document.querySelectorAll('.bg-animation span, .orbit-ring, .orbit-dot').forEach(el => el.style.animationPlayState = state);
@@ -99,13 +87,25 @@ function hideLoader() {
     if (loaderRAF) cancelAnimationFrame(loaderRAF);
     if (loadingScreen) loadingScreen.classList.add('hidden');
     tryAutoPlayMusic();
+    // Loading screen is decorative chrome — once it's gone, release it from
+    // the accessibility tree and stop it from ever intercepting focus/clicks.
+    if (loadingScreen) {
+        loadingScreen.setAttribute('aria-hidden', 'true');
+        setTimeout(() => { loadingScreen.style.display = 'none'; }, 450);
+    }
 }
 
-// Start the rAF loop
-loaderRAF = requestAnimationFrame(runLoader);
-
-// HARD FAILSAFE: if anything above stalls, force-hide after 3.5 s
-setTimeout(hideLoader, 3500);
+// Skip the loader entirely for users who've asked for reduced motion,
+// and for anyone landing directly on a deep link (in-page anchor).
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+if (prefersReducedMotion || window.location.hash) {
+    hideLoader();
+} else {
+    // Start the rAF loop
+    loaderRAF = requestAnimationFrame(runLoader);
+    // HARD FAILSAFE: if anything above stalls, force-hide after 3.5 s
+    setTimeout(hideLoader, 3500);
+}
 
 // ============================================
 // THEME TOGGLE — SMOOTH FLASH
@@ -115,14 +115,30 @@ const htmlEl   = document.documentElement;
 const iconDark  = themeToggle ? themeToggle.querySelector('.theme-icon-dark')  : null;
 const iconLight = themeToggle ? themeToggle.querySelector('.theme-icon-light') : null;
 
-const savedTheme = localStorage.getItem('tg-theme') || 'dark';
+function getPreferredTheme() {
+    const saved = localStorage.getItem('tg-theme');
+    if (saved === 'dark' || saved === 'light') return saved;
+    return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+}
+
+const savedTheme = getPreferredTheme();
 htmlEl.setAttribute('data-theme', savedTheme);
 updateThemeIcon(savedTheme);
+if (themeToggle) themeToggle.setAttribute('aria-pressed', savedTheme === 'light' ? 'true' : 'false');
 
 if (themeToggle) {
     themeToggle.addEventListener('click', () => {
         const current = htmlEl.getAttribute('data-theme');
         const next = current === 'dark' ? 'light' : 'dark';
+
+        // Respect reduced-motion users: skip the flash overlay entirely.
+        if (prefersReducedMotion) {
+            htmlEl.setAttribute('data-theme', next);
+            localStorage.setItem('tg-theme', next);
+            updateThemeIcon(next);
+            themeToggle.setAttribute('aria-pressed', next === 'light' ? 'true' : 'false');
+            return;
+        }
 
         const overlay = document.createElement('div');
         overlay.style.cssText = `position:fixed;inset:0;z-index:99999;pointer-events:none;
@@ -163,7 +179,7 @@ let musicEnabled = false;
 function tryAutoPlayMusic() {
     if (!bgMusic) return;
     const source = bgMusic.querySelector('source');
-    if (!source || !source.src) return;
+    if (!source || !source.getAttribute('src')) return;
     bgMusic.volume = 0.18;
     const p = bgMusic.play();
     if (p) p.then(() => { musicEnabled = true; updateMusicIcon(true); if (musicToggle) musicToggle.classList.add('active'); }).catch(() => { musicEnabled = false; updateMusicIcon(false); });
@@ -194,20 +210,36 @@ if (orchidBtn) {
     orchidBtn.addEventListener('click', async (e) => {
         e.preventDefault();
         const orchidValue = '0009-0003-4428-7162';
-        try {
-            await navigator.clipboard.writeText(orchidValue);
-            // Visual feedback: change button state temporarily
-            const originalHTML = orchidBtn.innerHTML;
+        const contactValue = orchidBtn.querySelector('.contact-value');
+        const originalText = contactValue ? contactValue.textContent : '';
+
+        function showCopied() {
             orchidBtn.style.borderColor = 'var(--accent-primary)';
             orchidBtn.style.background = 'var(--accent-subtle)';
-            const contactValue = orchidBtn.querySelector('.contact-value');
-            const originalText = contactValue.textContent;
-            contactValue.textContent = '✓ Copied!';
+            if (contactValue) contactValue.textContent = 'Copied!';
+            orchidBtn.setAttribute('aria-live', 'polite');
             setTimeout(() => {
-                contactValue.textContent = originalText;
+                if (contactValue) contactValue.textContent = originalText;
                 orchidBtn.style.borderColor = '';
                 orchidBtn.style.background = '';
             }, 2000);
+        }
+
+        try {
+            if (navigator.clipboard && window.isSecureContext) {
+                await navigator.clipboard.writeText(orchidValue);
+            } else {
+                // Fallback for non-secure contexts / older browsers
+                const ta = document.createElement('textarea');
+                ta.value = orchidValue;
+                ta.style.position = 'fixed';
+                ta.style.opacity = '0';
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+            }
+            showCopied();
         } catch (err) {
             console.error('Failed to copy ORCHID ID:', err);
         }
@@ -215,34 +247,34 @@ if (orchidBtn) {
 }
 
 // ============================================
-// CURSOR — non-touch only
+// CURSOR — non-touch, non-reduced-motion only
 // ============================================
-if (!isTouchDevice()) {
+if (!isTouchDevice() && !prefersReducedMotion && window.matchMedia('(hover: hover)').matches) {
     const cursorGlow = document.getElementById('cursorGlow');
+    const cursorSpotlight = document.getElementById('cursorSpotlight');
     let glowX = window.innerWidth / 2, glowY = window.innerHeight / 2;
     let targetGlowX = glowX, targetGlowY = glowY;
-    document.addEventListener('mousemove', e => { targetGlowX = e.clientX; targetGlowY = e.clientY; });
-    (function animateGlow() {
-        glowX += (targetGlowX - glowX) * 0.07;
-        glowY += (targetGlowY - glowY) * 0.07;
-        if (cursorGlow) { cursorGlow.style.left = glowX + 'px'; cursorGlow.style.top = glowY + 'px'; }
-        requestAnimationFrame(animateGlow);
-    })();
-
-    const cursorSpotlight = document.getElementById('cursorSpotlight');
     let spotX = -200, spotY = -200, targetSpotX = -200, targetSpotY = -200, spotActive = false;
+    let cursorRAF = null;
+
     document.addEventListener('mousemove', e => {
+        targetGlowX = e.clientX; targetGlowY = e.clientY;
         targetSpotX = e.clientX; targetSpotY = e.clientY;
-        const isOnHL = e.target.closest('.hl-hover') !== null || e.target.classList.contains('hl-hover');
+        const isOnHL = e.target.closest('.hl-hover') !== null;
         if (isOnHL && !spotActive) { spotActive = true; if (cursorSpotlight) cursorSpotlight.classList.add('active'); }
         else if (!isOnHL && spotActive) { spotActive = false; if (cursorSpotlight) cursorSpotlight.classList.remove('active'); }
-    });
+    }, { passive: true });
     document.addEventListener('mouseleave', () => { spotActive = false; if (cursorSpotlight) cursorSpotlight.classList.remove('active'); });
-    (function animateSpot() {
+
+    // Single rAF loop drives both elements — avoids two competing loops.
+    (function animateCursor() {
+        glowX += (targetGlowX - glowX) * 0.07;
+        glowY += (targetGlowY - glowY) * 0.07;
         spotX += (targetSpotX - spotX) * 0.18;
         spotY += (targetSpotY - spotY) * 0.18;
+        if (cursorGlow) { cursorGlow.style.left = glowX + 'px'; cursorGlow.style.top = glowY + 'px'; }
         if (cursorSpotlight) { cursorSpotlight.style.left = spotX + 'px'; cursorSpotlight.style.top = spotY + 'px'; }
-        requestAnimationFrame(animateSpot);
+        cursorRAF = requestAnimationFrame(animateCursor);
     })();
 }
 
@@ -254,10 +286,12 @@ const navMenu = document.getElementById('navMenu');
 function closeMenu() {
     if (mobileMenuToggle) { mobileMenuToggle.classList.remove('active'); mobileMenuToggle.setAttribute('aria-expanded','false'); }
     if (navMenu) navMenu.classList.remove('active');
+    document.body.classList.remove('menu-open');
 }
 function openMenu() {
     if (mobileMenuToggle) { mobileMenuToggle.classList.add('active'); mobileMenuToggle.setAttribute('aria-expanded','true'); }
     if (navMenu) navMenu.classList.add('active');
+    document.body.classList.add('menu-open');
 }
 if (mobileMenuToggle) {
     mobileMenuToggle.addEventListener('click', () => mobileMenuToggle.classList.contains('active') ? closeMenu() : openMenu());
@@ -271,11 +305,14 @@ if (mobileMenuToggle) {
 // ============================================
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function(e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
+        const targetId = this.getAttribute('href');
+        if (!targetId || targetId === '#') return;
+        const target = document.querySelector(targetId);
         if (target) {
+            e.preventDefault();
             const navHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nav-height')) || 70;
-            window.scrollTo({ top: target.getBoundingClientRect().top + window.pageYOffset - navHeight, behavior: 'smooth' });
+            window.scrollTo({ top: target.getBoundingClientRect().top + window.pageYOffset - navHeight, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+            history.pushState(null, '', targetId);
         }
     });
 });
@@ -284,14 +321,15 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 // SCROLL TO TOP + PROGRESS
 // ============================================
 const scrollTopBtn = document.getElementById('scrollTopBtn');
-function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+function scrollToTop() { window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' }); }
 let scrollTicking = false;
 window.addEventListener('scroll', () => {
     if (scrollTicking) return;
     scrollTicking = true;
     requestAnimationFrame(() => {
         const st = window.pageYOffset;
-        const prog = (st / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+        const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+        const prog = scrollable > 0 ? (st / scrollable) * 100 : 0;
         document.documentElement.style.setProperty('--scroll-progress', prog + '%');
         if (scrollTopBtn) {
             if (st > 300) {
@@ -305,127 +343,115 @@ window.addEventListener('scroll', () => {
 }, { passive: true });
 
 // Active nav
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('nav a[href^="#"]');
 function updateActiveNav() {
     let current = '';
-    document.querySelectorAll('section').forEach(s => { if (window.pageYOffset >= s.offsetTop - 180) current = s.getAttribute('id'); });
-    document.querySelectorAll('nav a').forEach(link => {
-        link.classList.remove('active');
-        if (link.getAttribute('href') === `#${current}`) link.classList.add('active');
+    sections.forEach(s => { if (window.pageYOffset >= s.offsetTop - 180) current = s.getAttribute('id'); });
+    navLinks.forEach(link => {
+        const isActive = link.getAttribute('href') === `#${current}`;
+        link.classList.toggle('active', isActive);
+        if (isActive) link.setAttribute('aria-current', 'true'); else link.removeAttribute('aria-current');
     });
 }
 
 // ============================================
-// SECTION REVEAL
+// SECTION REVEAL (CSS class-driven, no inline styles)
 // ============================================
-const sectionObserver = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.style.opacity = '1';
-            entry.target.style.transform = 'translateY(0)';
-            sectionObserver.unobserve(entry.target);
-        }
+const revealTargets = document.querySelectorAll('section, .timeline-item, .exp-entry, .skill-category, .cards .card, .projects-grid .project-card');
+if (prefersReducedMotion) {
+    revealTargets.forEach(el => el.classList.add('is-visible'));
+} else {
+    const revealObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                revealObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+    revealTargets.forEach(el => {
+        el.classList.add('reveal-init');
+        revealObserver.observe(el);
     });
-}, { threshold: 0.08, rootMargin: '0px 0px -80px 0px' });
 
-document.querySelectorAll('section').forEach(s => {
-    s.style.opacity = '0';
-    s.style.transform = 'translateY(20px)';
-    s.style.transition = 'opacity .7s ease, transform .7s ease';
-    sectionObserver.observe(s);
-});
-
-// ============================================
-// CARD RADIAL GRADIENT ON MOUSE MOVE
-// ============================================
-document.querySelectorAll('.card, .project-card').forEach(card => {
-    card.addEventListener('mousemove', e => {
-        const r = card.getBoundingClientRect();
-        card.style.setProperty('--mouse-x', ((e.clientX - r.left) / r.width * 100) + '%');
-        card.style.setProperty('--mouse-y', ((e.clientY - r.top)  / r.height * 100) + '%');
+    // Staggered delays for grouped items, applied via CSS custom property
+    document.querySelectorAll('.timeline-item, .skill-category, .cards .card, .projects-grid .project-card, .exp-entry').forEach((el, i) => {
+        el.style.setProperty('--reveal-delay', Math.min(i * 0.08, 0.5) + 's');
     });
-});
+}
 
 // ============================================
-// PARALLAX BG
+// CARD RADIAL GRADIENT ON MOUSE MOVE (desktop only)
 // ============================================
-let parallaxTick = false;
-window.addEventListener('scroll', () => {
-    if (parallaxTick) return;
-    parallaxTick = true;
-    requestAnimationFrame(() => {
-        const scrolled = window.pageYOffset;
-        document.querySelectorAll('.bg-animation span').forEach((el, i) => el.style.transform = `translateY(${scrolled * (i + 1) * 0.04}px)`);
-        parallaxTick = false;
+if (!isTouchDevice() && window.matchMedia('(hover: hover)').matches) {
+    document.querySelectorAll('.card, .project-card').forEach(card => {
+        card.addEventListener('mousemove', e => {
+            const r = card.getBoundingClientRect();
+            card.style.setProperty('--mouse-x', ((e.clientX - r.left) / r.width * 100) + '%');
+            card.style.setProperty('--mouse-y', ((e.clientY - r.top)  / r.height * 100) + '%');
+        });
     });
-}, { passive: true });
+}
 
 // ============================================
-// TIMELINE ANIMATION
+// PARALLAX BG (skipped for reduced motion)
 // ============================================
-const timelineObserver = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.style.opacity = '1';
-            entry.target.style.transform = 'translateX(0)';
-            timelineObserver.unobserve(entry.target);
-        }
-    });
-}, { threshold: 0.3 });
-document.querySelectorAll('.timeline-item').forEach((item, i) => {
-    item.style.opacity = '0';
-    item.style.transform = 'translateX(-30px)';
-    item.style.transition = `opacity .5s ease ${i * .07}s, transform .5s ease ${i * .07}s`;
-    timelineObserver.observe(item);
-});
+if (!prefersReducedMotion) {
+    let parallaxTick = false;
+    window.addEventListener('scroll', () => {
+        if (parallaxTick) return;
+        parallaxTick = true;
+        requestAnimationFrame(() => {
+            const scrolled = window.pageYOffset;
+            document.querySelectorAll('.bg-animation span').forEach((el, i) => el.style.transform = `translateY(${scrolled * (i + 1) * 0.04}px)`);
+            parallaxTick = false;
+        });
+    }, { passive: true });
+}
 
 // ============================================
-// EXP CARDS REVEAL
+// LANGUAGE ITEMS ANIMATION
 // ============================================
-const expObserver = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.style.opacity = '1';
-            entry.target.style.transform = 'translateY(0) scale(1)';
-            expObserver.unobserve(entry.target);
-        }
-    });
-}, { threshold: 0.15 });
-document.querySelectorAll('.exp-entry').forEach((entry, i) => {
-    entry.style.opacity = '0';
-    entry.style.transform = 'translateY(28px) scale(0.98)';
-    entry.style.transition = `opacity .6s ease ${i * .15}s, transform .6s ease ${i * .15}s`;
-    expObserver.observe(entry);
-});
+const langGrid = document.querySelector('.language-grid');
+if (langGrid) {
+    if (prefersReducedMotion) {
+        langGrid.querySelectorAll('.language-item').forEach(item => item.classList.add('is-visible'));
+    } else {
+        const langObserver = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.querySelectorAll('.language-item').forEach((item, i) => {
+                        setTimeout(() => item.classList.add('is-visible'), i * 100);
+                    });
+                    langObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.3 });
+        langGrid.querySelectorAll('.language-item').forEach(item => item.classList.add('reveal-init-x'));
+        langObserver.observe(langGrid);
+    }
+}
 
 // ============================================
-// SKILL CATEGORIES ANIMATION
+// ACHIEVEMENT BADGE PULSE
 // ============================================
-const skillObserver = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.style.opacity = '1';
-            entry.target.style.transform = 'translateX(0)';
-            skillObserver.unobserve(entry.target);
-        }
+if (!prefersReducedMotion) {
+    document.querySelectorAll('.achievement-badge').forEach(badge => {
+        badge.addEventListener('mouseenter', function() { this.style.animation = 'pulse .45s ease'; });
+        badge.addEventListener('animationend', function() { this.style.animation = ''; });
     });
-}, { threshold: 0.2 });
-document.querySelectorAll('.skill-category').forEach((cat, i) => {
-    cat.style.opacity = '0';
-    cat.style.transform = 'translateX(-30px)';
-    cat.style.transition = `opacity .5s ease ${i * .1}s, transform .5s ease ${i * .1}s`;
-    skillObserver.observe(cat);
-});
+}
 
 // ============================================
 // PROFILE FLOAT
 // ============================================
 const profileImg = document.getElementById('profileImg');
-if (profileImg) {
+if (profileImg && !prefersReducedMotion) {
     let floatDir = 1, floatTimer = null;
     function floatImage() {
         floatTimer = setInterval(() => {
             if (profileImg.matches(':hover')) return;
-            profileImg.style.transition = 'transform 2s ease-in-out, box-shadow .4s ease';
             profileImg.style.transform = `translateY(${floatDir * 5}px)`;
             floatDir *= -1;
         }, 2000);
@@ -436,105 +462,17 @@ if (profileImg) {
 }
 
 // ============================================
-// CARDS REVEAL (internship grid)
-// ============================================
-const cardObserver = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.style.opacity = '1';
-            entry.target.style.transform = 'translateY(0) scale(1)';
-            cardObserver.unobserve(entry.target);
-        }
-    });
-}, { threshold: 0.15 });
-document.querySelectorAll('.cards .card').forEach((card, i) => {
-    card.style.opacity = '0';
-    card.style.transform = 'translateY(24px) scale(0.97)';
-    card.style.transition = `opacity .5s ease ${i * .1}s, transform .5s ease ${i * .1}s`;
-    cardObserver.observe(card);
-});
-
-// Project cards reveal
-const projectObserver = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.style.opacity = '1';
-            entry.target.style.transform = 'translateY(0) scale(1)';
-            projectObserver.unobserve(entry.target);
-        }
-    });
-}, { threshold: 0.15 });
-document.querySelectorAll('.projects-grid .project-card').forEach((card, i) => {
-    card.style.opacity = '0';
-    card.style.transform = 'translateY(30px) scale(0.97)';
-    card.style.transition = `opacity .55s ease ${i * .1}s, transform .55s ease ${i * .1}s`;
-    projectObserver.observe(card);
-});
-
-// ============================================
-// LANGUAGE ITEMS ANIMATION
-// ============================================
-const langObserver = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.querySelectorAll('.language-item').forEach((item, i) => {
-                setTimeout(() => { item.style.opacity = '1'; item.style.transform = 'translateX(0)'; }, i * 120);
-            });
-            langObserver.unobserve(entry.target);
-        }
-    });
-}, { threshold: 0.3 });
-const langGrid = document.querySelector('.language-grid');
-if (langGrid) {
-    langGrid.querySelectorAll('.language-item').forEach(item => {
-        item.style.opacity = '0'; item.style.transform = 'translateX(-20px)';
-        item.style.transition = 'opacity .45s ease, transform .45s ease';
-    });
-    langObserver.observe(langGrid);
-}
-
-// ============================================
-// ACHIEVEMENT BADGE PULSE
-// ============================================
-document.querySelectorAll('.achievement-badge').forEach(badge => {
-    badge.addEventListener('mouseenter', function() { this.style.animation = 'pulse .45s ease'; });
-    badge.addEventListener('animationend', function() { this.style.animation = ''; });
-});
-
-// ============================================
-// EMAIL LINK FIX
-// Bypasses any Cloudflare email obfuscation by
-// setting the href via JS at runtime.
-// ============================================
-(function fixEmailLinks() {
-    const user   = 'ghosh.tanbi';
-    const domain = 'gmail.com';
-    const address = user + '@' + domain;
-    // Fix every contact-item whose label text is "Email"
-    document.querySelectorAll('.contact-item').forEach(function(item) {
-        const label = item.querySelector('.contact-label');
-        if (label && label.textContent.trim().toLowerCase() === 'email') {
-            // Force correct href
-            item.setAttribute('href', 'mailto:' + address);
-            // Fix displayed text — replace any obfuscated span/text
-            const val = item.querySelector('.contact-value');
-            if (val) val.textContent = address;
-        }
-    });
-})();
-
-// ============================================
 // LEADERSHIP BUBBLE TRANSITION
 // Injects rising bubbles between the two exp-cards
 // ============================================
 (function injectLeadershipBubbles() {
+    if (prefersReducedMotion) return;
     const timeline = document.querySelector('.exp-timeline');
     if (!timeline) return;
 
     const entries = timeline.querySelectorAll('.exp-entry');
     if (entries.length < 2) return;
 
-    // Create bubble container positioned between entry[0] bottom and entry[1]
     const container = document.createElement('div');
     container.className = 'exp-inter-bubbles';
     container.setAttribute('aria-hidden', 'true');
@@ -556,29 +494,18 @@ document.querySelectorAll('.achievement-badge').forEach(badge => {
         const b = document.createElement('span');
         b.className = 'exp-inter-bubble';
         b.style.cssText = [
-            'left:'             + def[0] + '%',
-            'width:'            + def[1] + 'px',
-            'height:'           + def[1] + 'px',
+            'left:'              + def[0] + '%',
+            'width:'             + def[1] + 'px',
+            'height:'            + def[1] + 'px',
             'animation-duration:'+ def[2] + 's',
-            'animation-delay:'  + def[3] + 's',
-            'background:'       + def[4],
+            'animation-delay:'   + def[3] + 's',
+            'background:'        + def[4],
         ].join(';');
         container.appendChild(b);
     });
 
-    // Insert after the first entry
     entries[0].insertAdjacentElement('afterend', container);
 })();
-
-// ============================================
-// DYNAMIC KEYFRAMES
-// ============================================
-const extraStyles = document.createElement('style');
-extraStyles.textContent = `
-@keyframes pulse { 0%,100%{transform:scale(1);}50%{transform:scale(1.14);} }
-@keyframes iconBounce { 0%,100%{transform:translateY(0) rotate(0);}25%{transform:translateY(-8px) rotate(-5deg);}75%{transform:translateY(-4px) rotate(5deg);} }
-`;
-document.head.appendChild(extraStyles);
 
 // ============================================
 // FOOTER YEAR
@@ -587,43 +514,11 @@ const yr = document.getElementById('currentYear');
 if (yr) yr.textContent = new Date().getFullYear();
 
 // ============================================
-// FLUID FONT SIZE
-// ============================================
-function adjustFontSize() {
-    const vw = window.innerWidth;
-    document.documentElement.style.fontSize =
-        (vw > 1440 ? 17 : vw > 1200 ? 16 : vw > 768 ? 15 : vw > 480 ? 14.5 : 14) + 'px';
-}
-adjustFontSize();
-window.addEventListener('resize', adjustFontSize, { passive: true });
-
-// ============================================
-// PAGE INIT
-// ============================================
-document.addEventListener('DOMContentLoaded', () => {
-    const hero = document.querySelector('.hero-content');
-    if (hero) {
-        hero.style.opacity = '0'; hero.style.transform = 'translateY(24px)';
-        setTimeout(() => { hero.style.transition = 'all .9s ease'; hero.style.opacity = '1'; hero.style.transform = 'translateY(0)'; }, 100);
-    }
-    setTimeout(() => document.body.classList.add('loaded'), 500);
-});
-
-// ============================================
 // TOUCH OPTIMIZATIONS
 // ============================================
 if (isTouchDevice()) {
     document.querySelectorAll('.card, .project-card, .skill-category, .timeline-item, .exp-card').forEach(el => {
-        el.addEventListener('touchstart', function() { this.style.borderColor = 'var(--accent-primary)'; }, { passive: true });
-        el.addEventListener('touchend', function() { setTimeout(() => this.style.borderColor = '', 300); }, { passive: true });
+        el.addEventListener('touchstart', function() { this.classList.add('touch-active'); }, { passive: true });
+        el.addEventListener('touchend', function() { setTimeout(() => this.classList.remove('touch-active'), 300); }, { passive: true });
     });
 }
-
-// ============================================
-// PERFORMANCE LOG
-// ============================================
-window.addEventListener('load', () => {
-    console.log('%cTanbi Ghosh Portfolio', 'color:#a8cdff;font-size:18px;font-weight:bold;');
-    console.log('%cLoaded in ' + performance.now().toFixed(2) + 'ms', 'color:#a8cdff;font-size:12px;');
-    console.log('%cContact: ghosh.tanbi@gmail.com', 'color:#8a9ab8;font-size:12px;');
-});

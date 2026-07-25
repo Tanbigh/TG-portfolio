@@ -358,7 +358,10 @@ function updateActiveNav() {
 // ============================================
 // SECTION REVEAL (CSS class-driven, no inline styles)
 // ============================================
-const revealTargets = document.querySelectorAll('section, .timeline-item, .exp-entry, .skill-category, .cards .card, .projects-grid .project-card');
+const revealTargets = document.querySelectorAll(
+    'section, .timeline-item, .skill-category, .cards .card, .projects-grid .project-card, ' +
+    '.experience-intro, .github-subtitle, .gh-card, .otw-card'
+);
 if (prefersReducedMotion) {
     revealTargets.forEach(el => el.classList.add('is-visible'));
 } else {
@@ -376,16 +379,52 @@ if (prefersReducedMotion) {
     });
 
     // Staggered delays for grouped items, applied via CSS custom property
-    document.querySelectorAll('.timeline-item, .skill-category, .cards .card, .projects-grid .project-card, .exp-entry').forEach((el, i) => {
+    document.querySelectorAll('.timeline-item, .skill-category, .cards .card, .projects-grid .project-card').forEach((el, i) => {
         el.style.setProperty('--reveal-delay', Math.min(i * 0.08, 0.5) + 's');
     });
 }
 
 // ============================================
+// EXPERIENCE TIMELINE REVEAL
+// The timeline cards live inside a nested scroll pane
+// (.experience-scroll). A viewport-rooted observer never
+// fires for cards clipped inside that pane until the user
+// scrolls the pane itself, which would leave most cards
+// permanently invisible. Reveal them as one batch as soon
+// as the section enters view instead — reliable on every
+// device, with the stagger delay preserved for the cascade.
+// ============================================
+(function revealExperienceTimeline() {
+    const expSection = document.querySelector('.experience-section');
+    const expNodes = document.querySelectorAll('.exp-node');
+    if (!expSection || !expNodes.length) return;
+
+    if (prefersReducedMotion) {
+        expNodes.forEach(el => el.classList.add('is-visible'));
+        return;
+    }
+
+    expNodes.forEach((el, i) => {
+        el.classList.add('reveal-init');
+        el.style.setProperty('--reveal-delay', Math.min(i * 0.07, 0.45) + 's');
+    });
+
+    const expObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                expNodes.forEach(el => el.classList.add('is-visible'));
+                expObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.05, rootMargin: '0px 0px -40px 0px' });
+    expObserver.observe(expSection);
+})();
+
+// ============================================
 // CARD RADIAL GRADIENT ON MOUSE MOVE (desktop only)
 // ============================================
 if (!isTouchDevice() && window.matchMedia('(hover: hover)').matches) {
-    document.querySelectorAll('.card, .project-card').forEach(card => {
+    document.querySelectorAll('.card, .project-card, .exp-node-card, .gh-card').forEach(card => {
         card.addEventListener('mousemove', e => {
             const r = card.getBoundingClientRect();
             card.style.setProperty('--mouse-x', ((e.clientX - r.left) / r.width * 100) + '%');
@@ -462,52 +501,6 @@ if (profileImg && !prefersReducedMotion) {
 }
 
 // ============================================
-// LEADERSHIP BUBBLE TRANSITION
-// Injects rising bubbles between the two exp-cards
-// ============================================
-(function injectLeadershipBubbles() {
-    if (prefersReducedMotion) return;
-    const timeline = document.querySelector('.exp-timeline');
-    if (!timeline) return;
-
-    const entries = timeline.querySelectorAll('.exp-entry');
-    if (entries.length < 2) return;
-
-    const container = document.createElement('div');
-    container.className = 'exp-inter-bubbles';
-    container.setAttribute('aria-hidden', 'true');
-
-    // Config for each bubble: [left%, size-px, duration-s, delay-s, colorVar]
-    const bubbleDefs = [
-        [8,   10, 3.6, 0.0,  'var(--accent-primary)'],
-        [18,  7,  4.2, 0.5,  'var(--accent-secondary)'],
-        [30,  13, 3.4, 1.0,  'var(--accent-gold)'],
-        [42,  8,  4.5, 0.3,  'var(--accent-primary)'],
-        [54,  11, 3.8, 0.8,  'var(--accent-secondary)'],
-        [65,  9,  4.1, 1.4,  'var(--accent-primary)'],
-        [75,  14, 3.5, 0.6,  'var(--accent-gold)'],
-        [87,  7,  4.3, 1.1,  'var(--accent-secondary)'],
-        [95,  10, 3.7, 0.2,  'var(--accent-primary)'],
-    ];
-
-    bubbleDefs.forEach(function(def) {
-        const b = document.createElement('span');
-        b.className = 'exp-inter-bubble';
-        b.style.cssText = [
-            'left:'              + def[0] + '%',
-            'width:'             + def[1] + 'px',
-            'height:'            + def[1] + 'px',
-            'animation-duration:'+ def[2] + 's',
-            'animation-delay:'   + def[3] + 's',
-            'background:'        + def[4],
-        ].join(';');
-        container.appendChild(b);
-    });
-
-    entries[0].insertAdjacentElement('afterend', container);
-})();
-
-// ============================================
 // FOOTER YEAR
 // ============================================
 const yr = document.getElementById('currentYear');
@@ -517,8 +510,218 @@ if (yr) yr.textContent = new Date().getFullYear();
 // TOUCH OPTIMIZATIONS
 // ============================================
 if (isTouchDevice()) {
-    document.querySelectorAll('.card, .project-card, .skill-category, .timeline-item, .exp-card').forEach(el => {
+    document.querySelectorAll('.card, .project-card, .skill-category, .timeline-item, .exp-node-card, .gh-card').forEach(el => {
         el.addEventListener('touchstart', function() { this.classList.add('touch-active'); }, { passive: true });
         el.addEventListener('touchend', function() { setTimeout(() => this.classList.remove('touch-active'), 300); }, { passive: true });
     });
 }
+
+// ============================================
+// EXPERIENCE CARD IMAGE FALLBACK
+// Swaps a missing/broken assets/experience/*.jpg for a
+// generated initials badge so the layout never looks broken.
+// ============================================
+window.handleExpImageError = function (img) {
+    if (!img || img.dataset.fallbackApplied) return;
+    img.dataset.fallbackApplied = 'true';
+    const initials = img.getAttribute('data-initials') || '?';
+    const wrap = img.parentElement;
+    img.remove();
+    if (!wrap) return;
+    const fallback = document.createElement('div');
+    fallback.className = 'exp-initials-fallback';
+    fallback.textContent = initials;
+    fallback.setAttribute('aria-hidden', 'true');
+    wrap.appendChild(fallback);
+};
+
+// ============================================
+// BUTTON RIPPLE EFFECT
+// ============================================
+if (!prefersReducedMotion) {
+    document.querySelectorAll('.ripple-btn').forEach(btn => {
+        btn.addEventListener('click', function (e) {
+            const rect = this.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const ripple = document.createElement('span');
+            ripple.className = 'ripple-effect';
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+            ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+            this.appendChild(ripple);
+            ripple.addEventListener('animationend', () => ripple.remove());
+        });
+    });
+}
+
+// ============================================
+// RESUME DOWNLOAD — graceful failure
+// If assets/resume.pdf hasn't been added yet, avoid a raw
+// browser 404: show a small toast and offer the email
+// fallback instead of a dead link.
+// ============================================
+(function resumeDownloadGuard() {
+    const buttons = document.querySelectorAll('.resume-download-btn');
+    if (!buttons.length) return;
+
+    let cachedOk = null; // null = unknown, true/false once checked
+
+    function showToast(message) {
+        let toast = document.getElementById('resumeToast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'resumeToast';
+            toast.className = 'resume-toast';
+            toast.setAttribute('role', 'status');
+            toast.setAttribute('aria-live', 'polite');
+            document.body.appendChild(toast);
+        }
+        toast.textContent = message;
+        toast.classList.add('show');
+        clearTimeout(toast._hideTimer);
+        toast._hideTimer = setTimeout(() => toast.classList.remove('show'), 4200);
+    }
+
+    buttons.forEach(btn => {
+        btn.addEventListener('click', function (e) {
+            if (cachedOk === true) return; // known good, let the download proceed
+            if (cachedOk === false) {
+                e.preventDefault();
+                showToast('Resume is being updated — email ghosh.tanbi@gmail.com for a copy in the meantime.');
+                return;
+            }
+            // First click: verify before letting the browser navigate
+            e.preventDefault();
+            const href = this.getAttribute('href');
+            fetch(href, { method: 'HEAD' })
+                .then(res => {
+                    cachedOk = res.ok;
+                    if (res.ok) {
+                        window.location.href = href;
+                    } else {
+                        showToast('Resume is being updated — email ghosh.tanbi@gmail.com for a copy in the meantime.');
+                    }
+                })
+                .catch(() => {
+                    cachedOk = false;
+                    showToast('Resume is being updated — email ghosh.tanbi@gmail.com for a copy in the meantime.');
+                });
+        });
+    });
+})();
+
+// ============================================
+// GITHUB CONTRIBUTIONS — live, dynamic, lazy-loaded
+// Fetches real contribution data (no manual entries) and renders
+// a GitHub-style calendar with month labels, legend, and a fade-in.
+// Loads only once the section scrolls into view.
+// ============================================
+(function githubContributions() {
+    const card = document.getElementById('ghCard');
+    if (!card) return;
+    const username = card.getAttribute('data-username') || 'Tanbigh';
+
+    const skeletonGrid  = document.getElementById('ghSkeletonGrid');
+    const calendarWrap  = document.getElementById('ghCalendarWrap');
+    const monthsEl      = document.getElementById('ghMonths');
+    const gridEl        = document.getElementById('ghGrid');
+    const fallbackEl    = document.getElementById('ghFallback');
+    const legendEl      = document.getElementById('ghLegend');
+    const totalEl       = document.getElementById('ghTotal');
+    const totalSkel     = document.getElementById('ghTotalSkel');
+
+    const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+    function showFallback() {
+        if (skeletonGrid) skeletonGrid.hidden = true;
+        if (fallbackEl) fallbackEl.hidden = false;
+        if (totalEl) totalEl.textContent = '';
+    }
+
+    function renderCalendar(contributions) {
+        if (!contributions || !contributions.length) { showFallback(); return; }
+
+        // Build week columns (7 rows each), padding the first week so the
+        // correct day-of-week lands in the correct row, GitHub-style.
+        const first = new Date(contributions[0].date + 'T00:00:00');
+        const leadingPad = first.getDay(); // 0 = Sunday
+        const cells = new Array(leadingPad).fill(null).concat(contributions);
+
+        const weeks = [];
+        for (let i = 0; i < cells.length; i += 7) weeks.push(cells.slice(i, i + 7));
+
+        // Month labels: one label wherever the month changes between columns
+        const monthFrag = document.createDocumentFragment();
+        let prevMonth = null;
+        weeks.forEach((week, colIndex) => {
+            const dayEntry = week.find(d => d !== null);
+            if (!dayEntry) return;
+            const m = new Date(dayEntry.date + 'T00:00:00').getMonth();
+            if (m !== prevMonth) {
+                const label = document.createElement('span');
+                label.className = 'gh-month-label';
+                label.style.gridColumnStart = String(colIndex + 1);
+                label.textContent = MONTHS[m];
+                monthFrag.appendChild(label);
+                prevMonth = m;
+            }
+        });
+
+        // Day cells
+        const gridFrag = document.createDocumentFragment();
+        let total = 0;
+        cells.forEach(day => {
+            const cell = document.createElement('span');
+            cell.className = 'gh-cell';
+            if (day) {
+                total += day.count || 0;
+                cell.dataset.level = String(day.level || 0);
+                cell.title = `${day.count || 0} contribution${day.count === 1 ? '' : 's'} on ${day.date}`;
+            } else {
+                cell.style.visibility = 'hidden';
+            }
+            gridFrag.appendChild(cell);
+        });
+
+        if (monthsEl) monthsEl.appendChild(monthFrag);
+        if (gridEl) gridEl.appendChild(gridFrag);
+        if (totalSkel) totalSkel.remove();
+        if (totalEl) totalEl.innerHTML = `<strong>${total.toLocaleString()}</strong> contributions in the last year`;
+        if (legendEl) legendEl.hidden = false;
+
+        if (skeletonGrid) skeletonGrid.hidden = true;
+        if (calendarWrap) { calendarWrap.hidden = false; calendarWrap.classList.add('gh-loaded'); }
+    }
+
+    async function loadContributions() {
+        try {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 9000);
+            const res = await fetch(`https://github-contributions-api.jogruber.de/v4/${encodeURIComponent(username)}?y=last`, {
+                signal: controller.signal
+            });
+            clearTimeout(timeout);
+            if (!res.ok) throw new Error('GitHub contributions request failed');
+            const data = await res.json();
+            renderCalendar(data && data.contributions);
+        } catch (err) {
+            console.error('GitHub contributions fetch failed:', err);
+            showFallback();
+        }
+    }
+
+    // Lazy-load: only fetch once the card is actually visible
+    if ('IntersectionObserver' in window) {
+        const ghObserver = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    loadContributions();
+                    ghObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px 200px 0px' });
+        ghObserver.observe(card);
+    } else {
+        loadContributions();
+    }
+})();

@@ -693,20 +693,70 @@ if (!prefersReducedMotion) {
         if (calendarWrap) { calendarWrap.hidden = false; calendarWrap.classList.add('gh-loaded'); }
     }
 
+    // Cache contribution data in localStorage for an hour — avoids refetching
+    // on every visit/reload and makes the graph render instantly on repeat views.
+    const CACHE_KEY = `gh-contrib-cache-${username}`;
+    const CACHE_TTL = 60 * 60 * 1000; // 1 hour
+
+    function readCache() {
+        try {
+            const raw = localStorage.getItem(CACHE_KEY);
+            if (!raw) return null;
+            const parsed = JSON.parse(raw);
+            if (!parsed || !parsed.timestamp || !parsed.contributions) return null;
+            if (Date.now() - parsed.timestamp > CACHE_TTL) return null;
+            return parsed.contributions;
+        } catch {
+            return null;
+        }
+    }
+
+    function writeCache(contributions) {
+        try {
+            localStorage.setItem(CACHE_KEY, JSON.stringify({ timestamp: Date.now(), contributions }));
+        } catch {
+            // Storage full/unavailable (private browsing, etc.) — safe to skip caching.
+        }
+    }
+
+    let settled = false; // guards against double-render (hard timeout race vs fetch)
+
+    function finish(contributions) {
+        if (settled) return;
+        settled = true;
+        if (contributions && contributions.length) {
+            renderCalendar(contributions);
+        } else {
+            showFallback();
+        }
+    }
+
     async function loadContributions() {
+        // Serve cached data instantly if we have it — no spinner, no wait.
+        const cached = readCache();
+        if (cached) { finish(cached); return; }
+
+        // Hard failsafe: no matter what happens with the network call below,
+        // never leave the skeleton/month-labels spinning indefinitely.
+        const hardTimeout = setTimeout(() => finish(null), 12000);
+
         try {
             const controller = new AbortController();
-            const timeout = setTimeout(() => controller.abort(), 9000);
+            const abortTimer = setTimeout(() => controller.abort(), 9000);
             const res = await fetch(`https://github-contributions-api.jogruber.de/v4/${encodeURIComponent(username)}?y=last`, {
                 signal: controller.signal
             });
-            clearTimeout(timeout);
+            clearTimeout(abortTimer);
             if (!res.ok) throw new Error('GitHub contributions request failed');
             const data = await res.json();
-            renderCalendar(data && data.contributions);
+            const contributions = data && data.contributions;
+            if (contributions && contributions.length) writeCache(contributions);
+            clearTimeout(hardTimeout);
+            finish(contributions);
         } catch (err) {
             console.error('GitHub contributions fetch failed:', err);
-            showFallback();
+            clearTimeout(hardTimeout);
+            finish(null);
         }
     }
 

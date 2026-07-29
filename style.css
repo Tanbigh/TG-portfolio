@@ -465,9 +465,6 @@ h2::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-5
 .skill-tag{display:inline-block;padding:.3rem .8rem;margin:.2rem;background:var(--accent-subtle);border-radius:20px;color:var(--text-primary);font-size:clamp(.78rem,1.5vw,.82rem);font-family:'DM Mono',monospace;cursor:default;border:1px solid transparent;transition:all .3s ease;}
 [data-theme="light"] .skill-tag{font-weight:500;}
 .skill-tag:hover{background:var(--accent-primary);color:var(--bg-primary);transform:scale(1.06) translateY(-2px);box-shadow:0 4px 14px var(--accent-glow);border-color:var(--accent-primary);}
-.skill-category-featured{border-left-color:var(--accent-gold);background:linear-gradient(135deg,var(--bg-card) 0%,rgba(240,192,112,.06) 100%);}
-.skill-category-featured h3{color:var(--accent-gold);}
-.skill-category-featured:hover{box-shadow:0 14px 40px rgba(240,192,112,.16);}
 
 /* ============================================
    TIMELINE (achievements)
@@ -551,6 +548,12 @@ h2::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-5
 .btn-otw-primary,.btn-otw-secondary{display:inline-flex;align-items:center;gap:.6rem;padding:.9rem 1.6rem;border-radius:10px;font-family:'DM Mono',monospace;font-weight:600;font-size:clamp(.8rem,1.5vw,.86rem);letter-spacing:.03em;text-decoration:none;position:relative;overflow:hidden;min-height:46px;transition:transform .3s ease,box-shadow .3s ease,border-color .3s ease;}
 .btn-otw-primary{background:var(--gradient-btn);color:#fff;}
 .btn-otw-primary:hover{transform:translateY(-3px);box-shadow:0 16px 36px var(--accent-glow);}
+/* mailto-btn: identical visual treatment to ripple-btn, but achieved with
+   pure CSS (:active pseudo-element) so email functionality never depends
+   on JavaScript running, loading, or executing without error. */
+.mailto-btn{position:relative;}
+.mailto-btn::after{content:'';position:absolute;inset:0;border-radius:inherit;background:rgba(255,255,255,.22);opacity:0;transform:scale(.4);transition:opacity .5s ease,transform .5s ease;pointer-events:none;}
+.mailto-btn:active::after{opacity:1;transform:scale(1);transition:opacity 0s,transform 0s;}
 .btn-otw-secondary{background:transparent;color:var(--accent-primary);border:1px solid var(--accent-mid);}
 .btn-otw-secondary:hover{transform:translateY(-3px);border-color:var(--accent-primary);background:var(--accent-subtle);}
 

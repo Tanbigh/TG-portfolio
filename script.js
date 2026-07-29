@@ -653,16 +653,21 @@ if (!prefersReducedMotion) {
         // Month labels: one label wherever the month changes between columns
         const monthFrag = document.createDocumentFragment();
         let prevMonth = null;
+        let prevLabelCol = -Infinity;
+        const MIN_COL_GAP = 3; // minimum columns between labels so text doesn't overlap
         weeks.forEach((week, colIndex) => {
             const dayEntry = week.find(d => d !== null);
             if (!dayEntry) return;
             const m = new Date(dayEntry.date + 'T00:00:00').getMonth();
-            if (m !== prevMonth) {
+            if (m !== prevMonth && (colIndex - prevLabelCol) >= MIN_COL_GAP) {
                 const label = document.createElement('span');
                 label.className = 'gh-month-label';
                 label.style.gridColumnStart = String(colIndex + 1);
                 label.textContent = MONTHS[m];
                 monthFrag.appendChild(label);
+                prevMonth = m;
+                prevLabelCol = colIndex;
+            } else if (m !== prevMonth) {
                 prevMonth = m;
             }
         });

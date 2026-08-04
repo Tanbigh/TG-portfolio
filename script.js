@@ -1,4 +1,3 @@
-
 // ============================================
 // UTILITY
 // ============================================
@@ -7,163 +6,182 @@ function isTouchDevice() {
 }
 
 // ============================================
-// MAILTO LINKS — "Let's Work Together" button + Email card
-// Forces navigation explicitly via script, on top of the native
-// href, so the mail client opens even if something in the page
-// (extension, overlay, etc.) ever interferes with default anchor
-// behavior. Also shows a copy-to-clipboard fallback toast if no
-// mail client responds, since a blank click is usually caused by
-// the OS/browser having no default mail app registered — not by
-// the code — and the person deserves a way forward either way.
+// GITHUB CONTRIBUTIONS — real data, fetched live from the
+// official GitHub REST API (api.github.com), not a third-party
+// proxy/image renderer. api.github.com sends CORS headers for
+// its public endpoints, so this runs straight from the browser
+// with no server of ours involved and no flaky middleman that
+// can go down. We render our own heatmap from the actual events.
+//
+// Note: GitHub's public events endpoint only reports roughly the
+// last ~90 days (it's not the same data source as the 365-day
+// calendar on github.com, which needs an authenticated GraphQL
+// call we can't safely make from client-side code) — so this
+// shows genuine, live, last-90-day activity rather than a full
+// year. That trade-off is what makes it reliable without a token.
 // ============================================
-(function initMailtoLinks() {
-    const links = document.querySelectorAll('.js-mailto-link');
-    if (!links.length) return;
+(function initGithubContributions() {
+    const card = document.getElementById('ghgCard');
+    if (!card) return;
+    const username = card.dataset.username || 'Tanbigh';
 
-    function showMailFallback(email) {
-        let toast = document.getElementById('mailFallbackToast');
-        if (!toast) {
-            toast = document.createElement('div');
-            toast.id = 'mailFallbackToast';
-            toast.className = 'resume-toast';
-            toast.setAttribute('role', 'status');
-            toast.setAttribute('aria-live', 'polite');
-            document.body.appendChild(toast);
+    const calSkel   = document.getElementById('ghgCalSkel');
+    const calScroll = document.getElementById('ghgCalScroll');
+    const calMonths = document.getElementById('ghgCalMonths');
+    const calGrid   = document.getElementById('ghgCalGrid');
+    const legend    = document.getElementById('ghgLegend');
+    const fallback  = document.getElementById('ghgFallback');
+    const statLine  = document.getElementById('ghgStatLine');
+
+    if (!calGrid) return;
+
+    const MS_DAY = 86400000;
+    const WINDOW_DAYS = 91; // ~13 weeks, as far back as the public events feed reliably reaches
+
+    function pad(n) { return String(n).padStart(2, '0'); }
+    function utcKey(y, m, d) { return `${y}-${pad(m + 1)}-${pad(d)}`; }
+    function utcMidnight(y, m, d) { return Date.UTC(y, m, d); }
+
+    function showFallback() {
+        if (calSkel) calSkel.hidden = true;
+        if (calScroll) calScroll.hidden = true;
+        if (legend) legend.hidden = true;
+        if (fallback) fallback.hidden = false;
+        if (statLine) statLine.innerHTML = '';
+    }
+
+    async function fetchEvents() {
+        // Two pages (up to ~200 events) is plenty; the endpoint itself
+        // caps out around 90 days of history regardless of page count.
+        const pageResults = await Promise.allSettled([1, 2].map(p =>
+            fetch(`https://api.github.com/users/${encodeURIComponent(username)}/events/public?per_page=100&page=${p}`, {
+                headers: { 'Accept': 'application/vnd.github+json' }
+            }).then(res => {
+                if (!res.ok) throw new Error('GitHub API responded ' + res.status);
+                return res.json();
+            })
+        ));
+
+        if (pageResults.every(r => r.status === 'rejected')) {
+            throw new Error('All GitHub API requests failed');
         }
-        toast.textContent = `No email app responded — address copied: ${email}`;
-        toast.classList.add('show');
-        clearTimeout(toast._hideTimer);
-        toast._hideTimer = setTimeout(() => toast.classList.remove('show'), 5000);
-        if (navigator.clipboard) navigator.clipboard.writeText(email).catch(() => {});
+
+        let events = [];
+        pageResults.forEach(r => {
+            if (r.status === 'fulfilled' && Array.isArray(r.value)) events = events.concat(r.value);
+        });
+        return events;
     }
 
-    function fireMailto(link) {
-        const href = link.getAttribute('href');
-        const label = link.dataset.mailtoLabel || 'mailto link';
-        console.log(`${label} clicked ->`, href);
-        if (!href) return;
-
-        window.location.href = href;
-
-        // Heuristic: if the tab is still in the foreground ~1.2s later,
-        // no mail client intercepted the mailto: request (most likely
-        // because no default mail app is registered on this device).
-        // Offer the email address as a copyable fallback so the click
-        // never dead-ends.
-        const email = href.replace('mailto:', '').split('?')[0];
-        const checkTimer = setTimeout(() => {
-            if (document.visibilityState === 'visible') {
-                showMailFallback(email);
+    function countsFromEvents(events) {
+        const counts = {}; // 'YYYY-MM-DD' (UTC) -> contribution weight
+        events.forEach(ev => {
+            if (!ev || !ev.created_at) return;
+            const day = ev.created_at.slice(0, 10); // created_at is already UTC ISO, so this is a safe UTC date key
+            let weight = 1;
+            if (ev.type === 'PushEvent' && ev.payload && Array.isArray(ev.payload.commits)) {
+                weight = Math.max(1, ev.payload.commits.length);
             }
-        }, 1200);
-        window.addEventListener('blur', () => clearTimeout(checkTimer), { once: true });
+            counts[day] = (counts[day] || 0) + weight;
+        });
+        return counts;
     }
 
-    links.forEach(link => {
-        link.addEventListener('click', function (e) {
-            fireMailto(this);
-        });
-
-        // Native <a> elements activate on Enter automatically, but NOT on
-        // Space (only <button> does that natively). Add explicit Space
-        // support so both keys work for full keyboard accessibility.
-        link.addEventListener('keydown', function (e) {
-            if (e.key === ' ' || e.code === 'Space' || e.key === 'Spacebar') {
-                e.preventDefault();
-                fireMailto(this);
-            }
-        });
-    });
-
-    // ------------------------------------------------------------
-    // SELF-DIAGNOSTIC: on load, ask the browser what element actually
-    // sits at the visual center of each mailto target. If it's not the
-    // link itself (or something inside it), an overlay truly is blocking
-    // clicks and this logs exactly which element + selector is guilty —
-    // no manual DevTools inspection required.
-    // ------------------------------------------------------------
-    window.addEventListener('load', () => {
-        setTimeout(() => {
-            links.forEach(link => {
-                const r = link.getBoundingClientRect();
-                if (r.width === 0 || r.height === 0) {
-                    console.warn(`[mailto-diagnostic] "${link.dataset.mailtoLabel}" has zero size — it may be hidden or collapsed.`);
-                    return;
-                }
-                const cx = r.left + r.width / 2;
-                const cy = r.top + r.height / 2;
-                const topEl = document.elementFromPoint(cx, cy);
-                const isSelfOrChild = topEl && (topEl === link || link.contains(topEl));
-                if (isSelfOrChild) {
-                    console.log(`[mailto-diagnostic] OK — "${link.dataset.mailtoLabel}" is the top-most element at its center point.`);
-                } else {
-                    const desc = topEl ? `${topEl.tagName.toLowerCase()}${topEl.id ? '#' + topEl.id : ''}${topEl.className ? '.' + String(topEl.className).replace(/\s+/g, '.') : ''}` : 'null';
-                    console.warn(`[mailto-diagnostic] BLOCKED — "${link.dataset.mailtoLabel}" is covered by: ${desc}`);
-                }
-            });
-        }, 500);
-    });
-})();
-
-// ============================================
-// GITHUB CONTRIBUTION IMAGES — fade in on load, show
-// fallback on error. Handled here (not inline onload/onerror
-// attributes) so each image gets its own real function scope —
-// no shared-scope variable collisions between them.
-// ============================================
-(function initGithubImages() {
-    const images = [
-        { imgId: 'ghgChart', skelId: 'ghgSkel' },
-        { imgId: 'ghgStreakChart', skelId: 'ghgStreakSkel' }
-    ];
-
-    function showFailed(img, skel) {
-        const wrap = img.closest('.ghg-img-wrap');
-        if (wrap) wrap.classList.add('ghg-error');
-        if (skel) skel.hidden = true;
+    function levelFor(count, max) {
+        if (!count) return 0;
+        if (max <= 1) return count > 0 ? 2 : 0;
+        const ratio = count / max;
+        if (ratio > 0.75) return 4;
+        if (ratio > 0.5) return 3;
+        if (ratio > 0.25) return 2;
+        return 1;
     }
 
-    images.forEach(({ imgId, skelId }) => {
-        const img = document.getElementById(imgId);
-        if (!img) return;
-        const skel = document.getElementById(skelId);
+    function buildGrid(counts) {
+        const now = new Date();
+        const todayUTC = utcMidnight(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+        const windowStartUTC = todayUTC - (WINDOW_DAYS - 1) * MS_DAY;
 
-        // HARD TIMEOUT: these are free third-party services and occasionally
-        // hang instead of erroring outright. If nothing has resolved within
-        // 8s, treat it as failed so the section never sits blank/loading
-        // forever — the fallback message always wins eventually.
-        const hangTimer = setTimeout(() => {
-            if (!img.classList.contains('is-loaded')) showFailed(img, skel);
-        }, 8000);
+        // Align the grid's first column to a Sunday so weekday rows line up.
+        const windowStartDate = new Date(windowStartUTC);
+        const gridStartUTC = windowStartUTC - windowStartDate.getUTCDay() * MS_DAY;
 
-        img.addEventListener('load', () => {
-            clearTimeout(hangTimer);
-            img.classList.add('is-loaded');
-            if (skel) skel.hidden = true;
-        });
-
-        img.addEventListener('error', () => {
-            // The primary service failed — try the documented fallback
-            // service once before giving up and showing the "couldn't
-            // load" message. This is real failover, not just a dead end.
-            const fallback = img.dataset.fallbackSrc;
-            if (fallback && !img.dataset.fallbackTried) {
-                img.dataset.fallbackTried = 'true';
-                img.src = fallback;
-                return;
-            }
-            clearTimeout(hangTimer);
-            showFailed(img, skel);
-        });
-
-        // Handle the case where the image loaded from cache before
-        // this listener was attached (load event already fired).
-        if (img.complete && img.naturalWidth > 0) {
-            clearTimeout(hangTimer);
-            img.classList.add('is-loaded');
-            if (skel) skel.hidden = true;
+        const cells = [];
+        let max = 0;
+        for (let t = gridStartUTC; t <= todayUTC; t += MS_DAY) {
+            const d = new Date(t);
+            const y = d.getUTCFullYear(), m = d.getUTCMonth(), day = d.getUTCDate();
+            const inWindow = t >= windowStartUTC;
+            const key = utcKey(y, m, day);
+            const count = inWindow ? (counts[key] || 0) : null;
+            if (count && count > max) max = count;
+            cells.push({ y, m, day, dow: d.getUTCDay(), count });
         }
-    });
+
+        calGrid.innerHTML = '';
+        calMonths.innerHTML = '';
+        const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        let weekIndex = 0, lastMonth = null;
+        const monthMarkers = [];
+
+        cells.forEach((cell, i) => {
+            if (cell.dow === 0 && i !== 0) weekIndex++;
+            const cellEl = document.createElement('div');
+            if (cell.count === null) {
+                cellEl.className = 'ghg-cal-day is-empty';
+            } else {
+                const level = levelFor(cell.count, max);
+                cellEl.className = 'ghg-cal-day';
+                cellEl.dataset.level = String(level);
+                const dateLabel = `${monthNames[cell.m]} ${cell.day}, ${cell.y}`;
+                const label = `${cell.count} contribution${cell.count === 1 ? '' : 's'} on ${dateLabel}`;
+                cellEl.title = label;
+                cellEl.setAttribute('aria-label', label);
+                if (cell.dow === 0 && cell.m !== lastMonth) {
+                    monthMarkers.push({ week: weekIndex, month: cell.m });
+                    lastMonth = cell.m;
+                }
+            }
+            calGrid.appendChild(cellEl);
+        });
+
+        monthMarkers.forEach((marker, idx) => {
+            const span = document.createElement('span');
+            span.textContent = monthNames[marker.month];
+            const nextWeek = idx < monthMarkers.length - 1 ? monthMarkers[idx + 1].week : weekIndex + 1;
+            span.style.width = Math.max(1, nextWeek - marker.week) * 15 + 'px';
+            calMonths.appendChild(span);
+        });
+
+        const real = cells.filter(c => c.count !== null);
+        const total = real.reduce((sum, c) => sum + c.count, 0);
+        let streak = 0;
+        for (let i = real.length - 1; i >= 0; i--) {
+            if (real[i].count > 0) streak++;
+            else break;
+        }
+        return { total, streak };
+    }
+
+    (async function run() {
+        try {
+            const events = await fetchEvents();
+            const counts = countsFromEvents(events);
+            const { total, streak } = buildGrid(counts);
+
+            if (statLine) {
+                statLine.innerHTML = `<strong>${total}</strong> contribution${total === 1 ? '' : 's'} in the last ~90 days` +
+                    (streak > 0 ? ` &middot; <strong>${streak}</strong>-day current streak` : '');
+            }
+            if (calSkel) calSkel.hidden = true;
+            if (calScroll) calScroll.hidden = false;
+            if (legend) legend.hidden = false;
+            if (fallback) fallback.hidden = true;
+        } catch (err) {
+            console.warn('GitHub contributions: live fetch failed, showing fallback.', err);
+            showFallback();
+        }
+    })();
 })();
 
 // ============================================

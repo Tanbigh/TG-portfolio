@@ -1,3 +1,4 @@
+
 // ============================================
 // UTILITY
 // ============================================
@@ -116,12 +117,27 @@ function isTouchDevice() {
         { imgId: 'ghgStreakChart', skelId: 'ghgStreakSkel' }
     ];
 
+    function showFailed(img, skel) {
+        const wrap = img.closest('.ghg-img-wrap');
+        if (wrap) wrap.classList.add('ghg-error');
+        if (skel) skel.hidden = true;
+    }
+
     images.forEach(({ imgId, skelId }) => {
         const img = document.getElementById(imgId);
         if (!img) return;
         const skel = document.getElementById(skelId);
 
+        // HARD TIMEOUT: these are free third-party services and occasionally
+        // hang instead of erroring outright. If nothing has resolved within
+        // 8s, treat it as failed so the section never sits blank/loading
+        // forever — the fallback message always wins eventually.
+        const hangTimer = setTimeout(() => {
+            if (!img.classList.contains('is-loaded')) showFailed(img, skel);
+        }, 8000);
+
         img.addEventListener('load', () => {
+            clearTimeout(hangTimer);
             img.classList.add('is-loaded');
             if (skel) skel.hidden = true;
         });
@@ -136,14 +152,14 @@ function isTouchDevice() {
                 img.src = fallback;
                 return;
             }
-            const wrap = img.closest('.ghg-img-wrap');
-            if (wrap) wrap.classList.add('ghg-error');
-            if (skel) skel.hidden = true;
+            clearTimeout(hangTimer);
+            showFailed(img, skel);
         });
 
         // Handle the case where the image loaded from cache before
         // this listener was attached (load event already fired).
         if (img.complete && img.naturalWidth > 0) {
+            clearTimeout(hangTimer);
             img.classList.add('is-loaded');
             if (skel) skel.hidden = true;
         }
@@ -206,8 +222,8 @@ const loaderPhrases = [
     'Welcome!'
 ];
 
-// Total visible duration in ms — exactly 3 seconds
-const LOADER_DURATION = 3000;
+// Total visible duration in ms — exactly 2.5 seconds
+const LOADER_DURATION = 2500;
 let loaderStartTime   = null;
 let loaderRAF         = null;
 let loaderDone        = false;
@@ -275,8 +291,8 @@ if (prefersReducedMotion || window.location.hash) {
 } else {
     // Start the rAF loop
     loaderRAF = requestAnimationFrame(runLoader);
-    // HARD FAILSAFE: if anything above stalls, force-hide after 3.5 s
-    setTimeout(hideLoader, 3500);
+    // HARD FAILSAFE: if anything above stalls, force-hide after 3 s
+    setTimeout(hideLoader, 3000);
 }
 
 // ============================================
@@ -482,12 +498,34 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         const target = document.querySelector(targetId);
         if (target) {
             e.preventDefault();
-            const navHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nav-height')) || 70;
+            // Read the ACTUAL rendered nav height instead of trying to parse the
+            // --nav-height custom property with parseInt(). Custom properties are
+            // returned as their raw, un-resolved text (e.g. "clamp(60px,8vh,80px)")
+            // by getComputedStyle, so parseInt() on that always returned NaN and
+            // silently fell back to a hardcoded 70 — wrong on many viewports.
+            const navEl = document.querySelector('nav');
+            const navHeight = (navEl ? navEl.offsetHeight : 70) + 16;
             window.scrollTo({ top: target.getBoundingClientRect().top + window.pageYOffset - navHeight, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
             history.pushState(null, '', targetId);
         }
     });
 });
+
+// Native/browser-driven anchor jumps (direct link with #hash, refresh, back/forward)
+// never run the click handler above, so they'd land with the section flush under
+// the fixed nav. scroll-margin-top on sections (in style.css) is the primary fix;
+// this just re-corrects once on load in case the browser already jumped before
+// that CSS could apply the offset.
+if (window.location.hash) {
+    window.addEventListener('load', () => {
+        const target = document.querySelector(window.location.hash);
+        if (target) {
+            const navEl = document.querySelector('nav');
+            const navHeight = (navEl ? navEl.offsetHeight : 70) + 16;
+            window.scrollTo({ top: target.getBoundingClientRect().top + window.pageYOffset - navHeight, behavior: 'auto' });
+        }
+    });
+}
 
 // ============================================
 // SCROLL TO TOP + PROGRESS
@@ -590,6 +628,15 @@ if (prefersReducedMotion) {
         });
     }, { threshold: 0.05, rootMargin: '0px 0px -40px 0px' });
     expObserver.observe(expSection);
+
+    // FAIL-SAFE: guarantee the timeline cards are never permanently stuck
+    // invisible if the observer misses its trigger for any reason (e.g. the
+    // section is inside a nested scroll pane on some devices). Cards get
+    // their scroll-triggered entrance normally; this is just a backstop.
+    setTimeout(() => {
+        expNodes.forEach(el => el.classList.add('is-visible'));
+        expObserver.disconnect();
+    }, 2500);
 })();
 
 // ============================================

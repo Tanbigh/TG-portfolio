@@ -127,6 +127,15 @@ function isTouchDevice() {
         });
 
         img.addEventListener('error', () => {
+            // The primary service failed — try the documented fallback
+            // service once before giving up and showing the "couldn't
+            // load" message. This is real failover, not just a dead end.
+            const fallback = img.dataset.fallbackSrc;
+            if (fallback && !img.dataset.fallbackTried) {
+                img.dataset.fallbackTried = 'true';
+                img.src = fallback;
+                return;
+            }
             const wrap = img.closest('.ghg-img-wrap');
             if (wrap) wrap.classList.add('ghg-error');
             if (skel) skel.hidden = true;

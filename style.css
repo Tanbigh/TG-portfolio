@@ -439,7 +439,7 @@ h2::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-5
 .project-card:hover{transform:translateY(-8px) scale(1.01);box-shadow:var(--card-hover-shadow);border-color:var(--accent-primary);}
 
 /* --- Project preview banner (visual thumbnail for every card) --- */
-.project-preview{position:relative;display:flex;align-items:center;justify-content:center;aspect-ratio:16/9;margin:calc(-1 * clamp(1.2rem,3vw,2rem)) calc(-1 * clamp(1.2rem,3vw,2rem)) 1.2rem;border-bottom:1px solid var(--border-color);overflow:hidden;background:var(--accent-subtle);}
+.project-preview{position:relative;display:flex;align-items:center;justify-content:center;height:200px;margin:calc(-1 * clamp(1.2rem,3vw,2rem)) calc(-1 * clamp(1.2rem,3vw,2rem)) 1.2rem;border-bottom:1px solid var(--border-color);overflow:hidden;background:var(--accent-subtle);border-radius:14px 14px 0 0;box-shadow:0 8px 20px rgba(0,0,0,.25);}
 .project-preview::before{content:'';position:absolute;inset:0;opacity:.9;background-image:
     radial-gradient(circle at 18% 20%, var(--accent-glow) 0%, transparent 45%),
     radial-gradient(circle at 82% 78%, rgba(240,192,112,.22) 0%, transparent 50%);
@@ -686,6 +686,7 @@ h2::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-5
 @media (max-width:480px) {
     .hero h2{font-size:.76rem;}
     .card,.project-card,.exp-node-card{padding:1.1rem;}
+    .project-preview{height:180px;}
     .skill-tag,.tech-tag{font-size:.72rem;padding:.22rem .55rem;}
     .achievement-badge{font-size:.7rem;padding:.2rem .5rem;}
     .contact-item{gap:.75rem;padding:.85rem 1rem;}

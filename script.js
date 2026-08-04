@@ -36,31 +36,108 @@ function isTouchDevice() {
         if (navigator.clipboard) navigator.clipboard.writeText(email).catch(() => {});
     }
 
+    function fireMailto(link) {
+        const href = link.getAttribute('href');
+        const label = link.dataset.mailtoLabel || 'mailto link';
+        console.log(`${label} clicked ->`, href);
+        if (!href) return;
+
+        window.location.href = href;
+
+        // Heuristic: if the tab is still in the foreground ~1.2s later,
+        // no mail client intercepted the mailto: request (most likely
+        // because no default mail app is registered on this device).
+        // Offer the email address as a copyable fallback so the click
+        // never dead-ends.
+        const email = href.replace('mailto:', '').split('?')[0];
+        const checkTimer = setTimeout(() => {
+            if (document.visibilityState === 'visible') {
+                showMailFallback(email);
+            }
+        }, 1200);
+        window.addEventListener('blur', () => clearTimeout(checkTimer), { once: true });
+    }
+
     links.forEach(link => {
         link.addEventListener('click', function (e) {
-            const href = this.getAttribute('href');
-            const label = this.dataset.mailtoLabel || 'mailto link';
-            console.log(`${label} clicked ->`, href);
-            if (!href) return;
-
-            // Let the native <a href="mailto:..."> behavior fire normally.
-            // As a safety net, also force it via script in case anything
-            // ever blocks the default action.
-            window.location.href = href;
-
-            // Heuristic: if the tab is still in the foreground ~1.2s later,
-            // no mail client intercepted the mailto: request (most likely
-            // because no default mail app is registered on this device).
-            // Offer the email address as a copyable fallback so the click
-            // never dead-ends.
-            const email = href.replace('mailto:', '').split('?')[0];
-            const checkTimer = setTimeout(() => {
-                if (document.visibilityState === 'visible') {
-                    showMailFallback(email);
-                }
-            }, 1200);
-            window.addEventListener('blur', () => clearTimeout(checkTimer), { once: true });
+            fireMailto(this);
         });
+
+        // Native <a> elements activate on Enter automatically, but NOT on
+        // Space (only <button> does that natively). Add explicit Space
+        // support so both keys work for full keyboard accessibility.
+        link.addEventListener('keydown', function (e) {
+            if (e.key === ' ' || e.code === 'Space' || e.key === 'Spacebar') {
+                e.preventDefault();
+                fireMailto(this);
+            }
+        });
+    });
+
+    // ------------------------------------------------------------
+    // SELF-DIAGNOSTIC: on load, ask the browser what element actually
+    // sits at the visual center of each mailto target. If it's not the
+    // link itself (or something inside it), an overlay truly is blocking
+    // clicks and this logs exactly which element + selector is guilty —
+    // no manual DevTools inspection required.
+    // ------------------------------------------------------------
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            links.forEach(link => {
+                const r = link.getBoundingClientRect();
+                if (r.width === 0 || r.height === 0) {
+                    console.warn(`[mailto-diagnostic] "${link.dataset.mailtoLabel}" has zero size — it may be hidden or collapsed.`);
+                    return;
+                }
+                const cx = r.left + r.width / 2;
+                const cy = r.top + r.height / 2;
+                const topEl = document.elementFromPoint(cx, cy);
+                const isSelfOrChild = topEl && (topEl === link || link.contains(topEl));
+                if (isSelfOrChild) {
+                    console.log(`[mailto-diagnostic] OK — "${link.dataset.mailtoLabel}" is the top-most element at its center point.`);
+                } else {
+                    const desc = topEl ? `${topEl.tagName.toLowerCase()}${topEl.id ? '#' + topEl.id : ''}${topEl.className ? '.' + String(topEl.className).replace(/\s+/g, '.') : ''}` : 'null';
+                    console.warn(`[mailto-diagnostic] BLOCKED — "${link.dataset.mailtoLabel}" is covered by: ${desc}`);
+                }
+            });
+        }, 500);
+    });
+})();
+
+// ============================================
+// GITHUB CONTRIBUTION IMAGES — fade in on load, show
+// fallback on error. Handled here (not inline onload/onerror
+// attributes) so each image gets its own real function scope —
+// no shared-scope variable collisions between them.
+// ============================================
+(function initGithubImages() {
+    const images = [
+        { imgId: 'ghgChart', skelId: 'ghgSkel' },
+        { imgId: 'ghgStreakChart', skelId: 'ghgStreakSkel' }
+    ];
+
+    images.forEach(({ imgId, skelId }) => {
+        const img = document.getElementById(imgId);
+        if (!img) return;
+        const skel = document.getElementById(skelId);
+
+        img.addEventListener('load', () => {
+            img.classList.add('is-loaded');
+            if (skel) skel.hidden = true;
+        });
+
+        img.addEventListener('error', () => {
+            const wrap = img.closest('.ghg-img-wrap');
+            if (wrap) wrap.classList.add('ghg-error');
+            if (skel) skel.hidden = true;
+        });
+
+        // Handle the case where the image loaded from cache before
+        // this listener was attached (load event already fired).
+        if (img.complete && img.naturalWidth > 0) {
+            img.classList.add('is-loaded');
+            if (skel) skel.hidden = true;
+        }
     });
 })();
 
@@ -419,7 +496,7 @@ function updateActiveNav() {
 // ============================================
 const revealTargets = document.querySelectorAll(
     'section, .timeline-item, .skill-category, .cards .card, .projects-grid .project-card, ' +
-    '.experience-intro, .github-subtitle, .gh-card, .otw-card'
+    '.experience-intro, .github-subtitle, .ghg-card, .otw-card'
 );
 if (prefersReducedMotion) {
     revealTargets.forEach(el => el.classList.add('is-visible'));
@@ -483,7 +560,7 @@ if (prefersReducedMotion) {
 // CARD RADIAL GRADIENT ON MOUSE MOVE (desktop only)
 // ============================================
 if (!isTouchDevice() && window.matchMedia('(hover: hover)').matches) {
-    document.querySelectorAll('.card, .project-card, .exp-node-card, .gh-card').forEach(card => {
+    document.querySelectorAll('.card, .project-card, .exp-node-card, .ghg-card').forEach(card => {
         card.addEventListener('mousemove', e => {
             const r = card.getBoundingClientRect();
             card.style.setProperty('--mouse-x', ((e.clientX - r.left) / r.width * 100) + '%');
@@ -569,7 +646,7 @@ if (yr) yr.textContent = new Date().getFullYear();
 // TOUCH OPTIMIZATIONS
 // ============================================
 if (isTouchDevice()) {
-    document.querySelectorAll('.card, .project-card, .skill-category, .timeline-item, .exp-node-card, .gh-card').forEach(el => {
+    document.querySelectorAll('.card, .project-card, .skill-category, .timeline-item, .exp-node-card, .ghg-card').forEach(el => {
         el.addEventListener('touchstart', function() { this.classList.add('touch-active'); }, { passive: true });
         el.addEventListener('touchend', function() { setTimeout(() => this.classList.remove('touch-active'), 300); }, { passive: true });
     });
@@ -667,175 +744,4 @@ if (!prefersReducedMotion) {
                 });
         });
     });
-})();
-
-// ============================================
-// GITHUB CONTRIBUTIONS — live, dynamic, lazy-loaded
-// Fetches real contribution data (no manual entries) and renders
-// a GitHub-style calendar with month labels, legend, and a fade-in.
-// Loads only once the section scrolls into view.
-// ============================================
-(function githubContributions() {
-    const card = document.getElementById('ghCard');
-    if (!card) return;
-    const username = card.getAttribute('data-username') || 'Tanbigh';
-
-    const skeletonGrid  = document.getElementById('ghSkeletonGrid');
-    const calendarWrap  = document.getElementById('ghCalendarWrap');
-    const monthsEl      = document.getElementById('ghMonths');
-    const gridEl        = document.getElementById('ghGrid');
-    const fallbackEl    = document.getElementById('ghFallback');
-    const legendEl      = document.getElementById('ghLegend');
-    const totalEl       = document.getElementById('ghTotal');
-    const totalSkel     = document.getElementById('ghTotalSkel');
-
-    const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-
-    function showFallback() {
-        if (skeletonGrid) skeletonGrid.hidden = true;
-        if (fallbackEl) fallbackEl.hidden = false;
-        if (totalEl) totalEl.textContent = '';
-    }
-
-    function renderCalendar(contributions) {
-        if (!contributions || !contributions.length) { showFallback(); return; }
-
-        // Build week columns (7 rows each), padding the first week so the
-        // correct day-of-week lands in the correct row, GitHub-style.
-        const first = new Date(contributions[0].date + 'T00:00:00');
-        const leadingPad = first.getDay(); // 0 = Sunday
-        const cells = new Array(leadingPad).fill(null).concat(contributions);
-
-        const weeks = [];
-        for (let i = 0; i < cells.length; i += 7) weeks.push(cells.slice(i, i + 7));
-
-        // Month labels: one label wherever the month changes between columns
-        const monthFrag = document.createDocumentFragment();
-        let prevMonth = null;
-        let prevLabelCol = -Infinity;
-        const MIN_COL_GAP = 3; // minimum columns between labels so text doesn't overlap
-        weeks.forEach((week, colIndex) => {
-            const dayEntry = week.find(d => d !== null);
-            if (!dayEntry) return;
-            const m = new Date(dayEntry.date + 'T00:00:00').getMonth();
-            if (m !== prevMonth && (colIndex - prevLabelCol) >= MIN_COL_GAP) {
-                const label = document.createElement('span');
-                label.className = 'gh-month-label';
-                label.style.gridColumnStart = String(colIndex + 1);
-                label.textContent = MONTHS[m];
-                monthFrag.appendChild(label);
-                prevMonth = m;
-                prevLabelCol = colIndex;
-            } else if (m !== prevMonth) {
-                prevMonth = m;
-            }
-        });
-
-        // Day cells
-        const gridFrag = document.createDocumentFragment();
-        let total = 0;
-        cells.forEach(day => {
-            const cell = document.createElement('span');
-            cell.className = 'gh-cell';
-            if (day) {
-                total += day.count || 0;
-                cell.dataset.level = String(day.level || 0);
-                cell.title = `${day.count || 0} contribution${day.count === 1 ? '' : 's'} on ${day.date}`;
-            } else {
-                cell.style.visibility = 'hidden';
-            }
-            gridFrag.appendChild(cell);
-        });
-
-        if (monthsEl) monthsEl.appendChild(monthFrag);
-        if (gridEl) gridEl.appendChild(gridFrag);
-        if (totalSkel) totalSkel.remove();
-        if (totalEl) totalEl.innerHTML = `<strong>${total.toLocaleString()}</strong> contributions in the last year`;
-        if (legendEl) legendEl.hidden = false;
-
-        if (skeletonGrid) skeletonGrid.hidden = true;
-        if (calendarWrap) { calendarWrap.hidden = false; calendarWrap.classList.add('gh-loaded'); }
-    }
-
-    // Cache contribution data in localStorage for an hour — avoids refetching
-    // on every visit/reload and makes the graph render instantly on repeat views.
-    const CACHE_KEY = `gh-contrib-cache-${username}`;
-    const CACHE_TTL = 60 * 60 * 1000; // 1 hour
-
-    function readCache() {
-        try {
-            const raw = localStorage.getItem(CACHE_KEY);
-            if (!raw) return null;
-            const parsed = JSON.parse(raw);
-            if (!parsed || !parsed.timestamp || !parsed.contributions) return null;
-            if (Date.now() - parsed.timestamp > CACHE_TTL) return null;
-            return parsed.contributions;
-        } catch {
-            return null;
-        }
-    }
-
-    function writeCache(contributions) {
-        try {
-            localStorage.setItem(CACHE_KEY, JSON.stringify({ timestamp: Date.now(), contributions }));
-        } catch {
-            // Storage full/unavailable (private browsing, etc.) — safe to skip caching.
-        }
-    }
-
-    let settled = false; // guards against double-render (hard timeout race vs fetch)
-
-    function finish(contributions) {
-        if (settled) return;
-        settled = true;
-        if (contributions && contributions.length) {
-            renderCalendar(contributions);
-        } else {
-            showFallback();
-        }
-    }
-
-    async function loadContributions() {
-        // Serve cached data instantly if we have it — no spinner, no wait.
-        const cached = readCache();
-        if (cached) { finish(cached); return; }
-
-        // Hard failsafe: no matter what happens with the network call below,
-        // never leave the skeleton/month-labels spinning indefinitely.
-        const hardTimeout = setTimeout(() => finish(null), 12000);
-
-        try {
-            const controller = new AbortController();
-            const abortTimer = setTimeout(() => controller.abort(), 9000);
-            const res = await fetch(`https://github-contributions-api.jogruber.de/v4/${encodeURIComponent(username)}?y=last`, {
-                signal: controller.signal
-            });
-            clearTimeout(abortTimer);
-            if (!res.ok) throw new Error('GitHub contributions request failed');
-            const data = await res.json();
-            const contributions = data && data.contributions;
-            if (contributions && contributions.length) writeCache(contributions);
-            clearTimeout(hardTimeout);
-            finish(contributions);
-        } catch (err) {
-            console.error('GitHub contributions fetch failed:', err);
-            clearTimeout(hardTimeout);
-            finish(null);
-        }
-    }
-
-    // Lazy-load: only fetch once the card is actually visible
-    if ('IntersectionObserver' in window) {
-        const ghObserver = new IntersectionObserver(entries => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    loadContributions();
-                    ghObserver.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.1, rootMargin: '0px 0px 200px 0px' });
-        ghObserver.observe(card);
-    } else {
-        loadContributions();
-    }
 })();

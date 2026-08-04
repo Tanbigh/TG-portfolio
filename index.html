@@ -881,47 +881,37 @@
 </section>
 
 <!-- ═══════════════════════════════════════
-     GITHUB CONTRIBUTIONS — live, dynamic
+     GITHUB CONTRIBUTIONS — real, live, third-party SVG
+     No custom-built calendar. No cached JSON. No manual squares.
+     The images below are generated fresh on every page load by
+     external GitHub-stats services, reading live from Tanbigh's
+     GitHub profile. If GitHub activity changes, the image changes
+     the next time the page (or the image) is requested — nothing
+     on this site needs to be touched.
 ═══════════════════════════════════════ -->
 <section id="github" class="github-section" aria-labelledby="github-heading">
     <div class="container">
         <h2 id="github-heading" class="hl-hover">GitHub Contributions</h2>
         <p class="github-subtitle reveal-init">Live activity pulled straight from GitHub &mdash; no manual updates.</p>
 
-        <div class="gh-card reveal-init" id="ghCard" data-username="Tanbigh">
-            <div class="gh-card-top">
-                <a class="gh-user" href="https://github.com/Tanbigh" target="_blank" rel="noopener noreferrer">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                    </svg>
-                    <span>@Tanbigh</span>
-                </a>
-                <span class="gh-total" id="ghTotal" aria-live="polite">
-                    <span class="gh-skel gh-skel-text" id="ghTotalSkel"></span>
-                </span>
-            </div>
+        <div class="ghg-card reveal-init" id="ghgCard">
+            <a class="gh-user" href="https://github.com/Tanbigh" target="_blank" rel="noopener noreferrer">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                </svg>
+                <span>@Tanbigh</span>
+            </a>
 
-            <div class="gh-body">
-                <!-- Loading skeleton -->
-                <div class="gh-skel-grid" id="ghSkeletonGrid" aria-hidden="true">
-                    <div class="gh-skel-months"></div>
-                    <div class="gh-skel-cells">
-                        <span class="gh-skel"></span><span class="gh-skel"></span><span class="gh-skel"></span>
-                        <span class="gh-skel"></span><span class="gh-skel"></span><span class="gh-skel"></span>
-                        <span class="gh-skel"></span><span class="gh-skel"></span><span class="gh-skel"></span>
-                        <span class="gh-skel"></span><span class="gh-skel"></span><span class="gh-skel"></span>
-                    </div>
-                </div>
-
-                <!-- Real calendar (populated by JS, fades in) -->
-                <div class="gh-calendar-wrap" id="ghCalendarWrap" hidden>
-                    <div class="gh-months" id="ghMonths" aria-hidden="true"></div>
-                    <div class="gh-grid" id="ghGrid" role="img" aria-label="GitHub contribution graph"></div>
-                </div>
-
-                <!-- Fallback on failure -->
-                <div class="gh-fallback" id="ghFallback" hidden>
-                    <p>Couldn&rsquo;t load live contribution data right now.</p>
+            <div class="ghg-img-wrap">
+                <div class="ghg-skel" id="ghgSkel" aria-hidden="true"></div>
+                <img
+                    id="ghgChart"
+                    class="ghg-img"
+                    src="https://ghchart.rshah.org/00d4ff/Tanbigh"
+                    alt="Tanbigh's GitHub contribution graph, generated live from GitHub"
+                    loading="lazy">
+                <div class="ghg-fallback">
+                    <p>Couldn&rsquo;t load the live graph right now.</p>
                     <a href="https://github.com/Tanbigh" target="_blank" rel="noopener noreferrer" class="project-btn">
                         View GitHub Profile
                         <span class="visually-hidden"> (opens in a new tab)</span>
@@ -929,14 +919,14 @@
                 </div>
             </div>
 
-            <div class="gh-legend" id="ghLegend" hidden>
-                <span>Less</span>
-                <span class="gh-legend-cell" data-level="0"></span>
-                <span class="gh-legend-cell" data-level="1"></span>
-                <span class="gh-legend-cell" data-level="2"></span>
-                <span class="gh-legend-cell" data-level="3"></span>
-                <span class="gh-legend-cell" data-level="4"></span>
-                <span>More</span>
+            <div class="ghg-img-wrap ghg-streak">
+                <div class="ghg-skel" id="ghgStreakSkel" aria-hidden="true"></div>
+                <img
+                    id="ghgStreakChart"
+                    class="ghg-img ghg-streak-img"
+                    src="https://streak-stats.demolab.com/?user=Tanbigh&theme=dark&hide_border=true&background=00000000&ring=00d4ff&fire=f0c070&currStreakLabel=00d4ff"
+                    alt="Tanbigh's GitHub streak statistics, generated live from GitHub"
+                    loading="lazy">
             </div>
         </div>
     </div>

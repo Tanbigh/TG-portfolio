@@ -50,7 +50,7 @@ html { scroll-behavior:smooth; -webkit-text-size-adjust:100%; text-size-adjust:1
    ============================================ */
 body, .card, .project-card, .skill-category, .exp-node-card, .contact-item, .timeline-item,
 nav, .footer, .ctrl-btn, .skill-tag, .tech-tag, .achievement-badge, .language-item,
-.contact-icon, .contact-value, .exp-node-position, .exp-node-desc, .gh-card, .otw-card {
+.contact-icon, .contact-value, .exp-node-position, .exp-node-desc, .ghg-card, .otw-card {
     transition:background-color .4s ease,border-color .4s ease,color .3s ease,box-shadow .3s ease;
 }
 .project-btn  { transition:transform .3s ease,box-shadow .3s ease !important; }
@@ -212,7 +212,8 @@ body.menu-open { overflow:hidden; }
 /* ============================================
    FLOATING CONTROLS
    ============================================ */
-.floating-controls{position:fixed;top:50%;right:clamp(.6rem,2vw,1.4rem);transform:translateY(-50%);z-index:999;display:flex;flex-direction:column;gap:.65rem;}
+.floating-controls{position:fixed;top:50%;right:clamp(.6rem,2vw,1.4rem);transform:translateY(-50%);z-index:999;display:flex;flex-direction:column;gap:.65rem;pointer-events:none;}
+.floating-controls .ctrl-btn{pointer-events:auto;}
 .ctrl-btn{width:var(--touch-target);height:var(--touch-target);border-radius:50%;background:var(--bg-card);border:1px solid var(--border-color);color:var(--accent-primary);font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px var(--overlay);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);position:relative;overflow:hidden;min-width:40px;min-height:40px;}
 .ctrl-btn::before{content:'';position:absolute;inset:0;border-radius:50%;background:var(--accent-primary);opacity:0;transition:opacity .3s ease;}
 .ctrl-btn:hover::before{opacity:.12;}
@@ -295,10 +296,25 @@ h2::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-5
 .section-subheading{color:var(--accent-primary);margin-top:2rem;margin-bottom:1rem;font-size:clamp(.9rem,2vw,1.05rem);font-family:'DM Serif Display',serif;font-weight:400;text-align:left;}
 .friendly-collab-heading{font-size:clamp(.82rem,1.7vw,.92rem);margin-bottom:.4rem;opacity:.92;}
 
-/* Belt-and-suspenders: guarantee these two are always the top-most,
-   fully clickable element at their position, regardless of any
-   decorative layer stacking elsewhere on the page. */
-#workTogetherBtn,#emailCard{position:relative;z-index:5;pointer-events:auto;cursor:pointer;}
+/* ROOT CAUSE, found and fixed:
+   The scroll-reveal system (see script.js revealTargets) adds
+   `transform: translateY(0)` to every <section> once it's visible.
+   translateY(0) is still "a transform value other than none", so per
+   spec it creates a brand-new stacking context on the section itself
+   — permanently, the moment it scrolls into view. That traps every
+   z-index inside #contact and #open-to-work in a LOCAL context that
+   sits at implicit stacking order in <body>, underneath any element
+   with an explicit z-index there — including .floating-controls
+   (position:fixed, z-index:999, permanently vertically-centered at
+   the right edge of the viewport on every scroll position). No
+   z-index set on a descendant button/card could ever escape that and
+   beat 999, which is exactly why the buttons looked clickable
+   (hover/focus/animation all worked) but the click never "landed" —
+   the fixed control strip was compositing above them on some scroll
+   positions. Fixing it at the section level, where the trap actually
+   is: */
+#contact,#open-to-work{position:relative;z-index:1001;}
+#workTogetherBtn,#emailCard{position:relative;z-index:2;pointer-events:auto;cursor:pointer;}
 
 /* ============================================
    SCROLL-REVEAL (CSS-driven, JS only toggles class)
@@ -489,54 +505,37 @@ h2::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-5
 .timeline-item p{color:var(--text-secondary);font-size:clamp(.8rem,1.5vw,.85rem);line-height:1.65;}
 
 /* ============================================
-   GITHUB CONTRIBUTIONS — premium live calendar card
+   GITHUB CONTRIBUTIONS — real, live, third-party SVG graph
    ============================================ */
 .github-subtitle{text-align:center;color:var(--text-secondary);font-size:clamp(.82rem,1.6vw,.92rem);margin-top:-1.2rem;margin-bottom:2rem;}
-.gh-card{position:relative;max-width:920px;margin:0 auto;padding:clamp(1.2rem,3vw,2rem);border-radius:18px;background:rgba(255,255,255,.03);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--border-color);overflow:hidden;transition:border-color .4s ease,box-shadow .4s ease;}
-[data-theme="light"] .gh-card{background:rgba(255,255,255,.6);}
-.gh-card:hover{border-color:var(--accent-primary);box-shadow:var(--card-hover-shadow);}
-.gh-card-top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.8rem;margin-bottom:1.4rem;}
-.gh-user{display:flex;align-items:center;gap:.6rem;color:var(--accent-primary);text-decoration:none;font-family:'DM Mono',monospace;font-weight:600;font-size:.9rem;}
+.ghg-card{position:relative;max-width:920px;margin:0 auto;padding:clamp(1.2rem,3vw,2rem);border-radius:18px;background:rgba(255,255,255,.03);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--border-color);overflow:hidden;transition:border-color .4s ease,box-shadow .4s ease;display:flex;flex-direction:column;gap:1.4rem;}
+[data-theme="light"] .ghg-card{background:rgba(255,255,255,.6);}
+.ghg-card:hover{border-color:var(--accent-primary);box-shadow:var(--card-hover-shadow);}
+.gh-user{display:flex;align-items:center;gap:.6rem;color:var(--accent-primary);text-decoration:none;font-family:'DM Mono',monospace;font-weight:600;font-size:.9rem;align-self:flex-start;}
 .gh-user:hover{text-decoration:underline;}
-.gh-total{font-family:'DM Mono',monospace;font-size:.85rem;color:var(--text-secondary);min-height:1.2em;}
-.gh-total strong{color:var(--accent-primary);font-weight:700;}
 
-.gh-body{position:relative;min-height:132px;}
-.gh-skel-grid{display:flex;flex-direction:column;gap:.5rem;}
-.gh-skel-months{height:14px;width:70%;border-radius:4px;}
-.gh-skel-cells{display:grid;grid-template-columns:repeat(12,1fr);gap:8px;}
-.gh-skel{display:block;height:60px;border-radius:8px;}
-.gh-skel, .gh-skel-months{background:linear-gradient(90deg,var(--accent-subtle) 25%,var(--accent-mid) 50%,var(--accent-subtle) 75%);background-size:200% 100%;animation:ghShimmer 1.6s ease-in-out infinite;}
-.gh-skel-text{display:inline-block;width:150px;height:14px;border-radius:4px;}
+.ghg-img-wrap{position:relative;min-height:120px;border-radius:12px;overflow-x:auto;overflow-y:hidden;background:rgba(255,255,255,.02);}
+.ghg-img{display:block;width:100%;min-width:600px;height:auto;opacity:0;transition:opacity .5s ease;border-radius:10px;}
+.ghg-img.is-loaded{opacity:1;}
+.ghg-streak .ghg-img{min-width:300px;max-width:420px;margin:0 auto;}
+.ghg-skel{position:absolute;inset:0;border-radius:12px;background:linear-gradient(90deg,var(--accent-subtle) 25%,var(--accent-mid) 50%,var(--accent-subtle) 75%);background-size:200% 100%;animation:ghShimmer 1.6s ease-in-out infinite;}
 @keyframes ghShimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
 
-.gh-calendar-wrap{overflow-x:auto;overflow-y:hidden;padding-bottom:.4rem;opacity:0;animation:none;}
-.gh-calendar-wrap.gh-loaded{opacity:1;animation:fadeIn .6s ease forwards;}
-.gh-months{display:grid;grid-auto-flow:column;grid-auto-columns:13px;gap:3px;margin-bottom:6px;min-width:max-content;}
-.gh-month-label{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--text-muted);white-space:nowrap;grid-row:1;}
-.gh-grid{display:grid;grid-template-rows:repeat(7,13px);grid-auto-flow:column;grid-auto-columns:13px;gap:3px;min-width:max-content;}
-.gh-cell{width:11px;height:11px;border-radius:3px;background:var(--accent-subtle);border:1px solid var(--border-color);transition:transform .15s ease,box-shadow .15s ease;}
-.gh-cell:hover{transform:scale(1.35);box-shadow:0 0 8px var(--accent-glow);z-index:1;}
-.gh-cell[data-level="1"]{background:var(--accent-mid);border-color:transparent;}
-.gh-cell[data-level="2"]{background:var(--accent-secondary);opacity:.75;border-color:transparent;}
-.gh-cell[data-level="3"]{background:var(--accent-secondary);opacity:1;border-color:transparent;box-shadow:0 0 5px var(--accent-glow);}
-.gh-cell[data-level="4"]{background:var(--accent-primary);border-color:transparent;box-shadow:0 0 9px var(--accent-glow);}
-
-.gh-legend{display:flex;align-items:center;justify-content:flex-end;gap:.35rem;margin-top:1rem;font-family:'DM Mono',monospace;font-size:.72rem;color:var(--text-muted);}
-.gh-legend-cell{width:10px;height:10px;border-radius:3px;background:var(--accent-subtle);border:1px solid var(--border-color);}
-.gh-legend-cell[data-level="1"]{background:var(--accent-mid);border-color:transparent;}
-.gh-legend-cell[data-level="2"]{background:var(--accent-secondary);opacity:.75;border-color:transparent;}
-.gh-legend-cell[data-level="3"]{background:var(--accent-secondary);opacity:1;border-color:transparent;}
-.gh-legend-cell[data-level="4"]{background:var(--accent-primary);border-color:transparent;box-shadow:0 0 6px var(--accent-glow);}
-
-.gh-fallback{text-align:center;padding:1.5rem 0;}
-.gh-fallback p{color:var(--text-secondary);margin-bottom:1.2rem;font-size:.9rem;}
+.ghg-fallback{display:none;text-align:center;padding:1.5rem 0;}
+.ghg-error .ghg-fallback{display:block;}
+.ghg-error .ghg-img{display:none;}
+.ghg-fallback p{color:var(--text-secondary);margin-bottom:1.2rem;font-size:.9rem;}
 
 /* ============================================
    OPEN TO WORK — final CTA
    ============================================ */
 .otw-section{padding-top:0;}
-.otw-card{position:relative;max-width:820px;margin:0 auto;padding:clamp(2.4rem,6vw,4rem) clamp(1.5rem,5vw,3rem);border-radius:24px;text-align:center;overflow:hidden;background:rgba(255,255,255,.03);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);isolation:isolate;}
+/* isolation:isolate means anything inside (including #workTogetherBtn's
+   own z-index) only stacks relative to siblings INSIDE this card — it
+   cannot out-rank elements outside it, like .floating-controls
+   (z-index:999, position:fixed). The card itself needs the elevated
+   z-index so the whole isolated unit wins that comparison. */
+.otw-card{position:relative;z-index:1001;max-width:820px;margin:0 auto;padding:clamp(2.4rem,6vw,4rem) clamp(1.5rem,5vw,3rem);border-radius:24px;text-align:center;overflow:hidden;background:rgba(255,255,255,.03);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);isolation:isolate;}
 [data-theme="light"] .otw-card{background:rgba(255,255,255,.65);}
 .otw-card::before{content:'';position:absolute;inset:0;border-radius:24px;padding:1.5px;background:var(--gradient);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:.55;z-index:0;}
 .otw-glow{position:absolute;top:-30%;left:50%;transform:translateX(-50%);width:120%;height:160%;background:radial-gradient(circle,var(--accent-glow) 0%,transparent 60%);opacity:.5;filter:blur(20px);z-index:-1;animation:otwGlowPulse 5s ease-in-out infinite;}
@@ -638,7 +637,7 @@ h2::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-5
     *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important;}
     .orbit-ring,.orbit-dot,.bg-animation span,.loader-particles span,.loader-meteors span,
     .loader-ring,.loader-bg-grid,.bubble-ring,.sdiv-bubble,
-    .otw-particles span,.otw-glow,.exp-node-card::before,.gh-skel,.gh-skel-months{animation:none!important;opacity:0!important;}
+    .otw-particles span,.otw-glow,.exp-node-card::before,.ghg-skel{animation:none!important;opacity:0!important;}
     .profile-image:hover{transform:none;}
     .reveal-init,.reveal-init-x{opacity:1!important;transform:none!important;}
 }
@@ -683,8 +682,8 @@ h2::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-5
     .timeline-item{padding-left:1rem;}
     .otw-actions{flex-direction:column;align-items:stretch;}
     .btn-otw-primary,.btn-otw-secondary{justify-content:center;}
-    .gh-grid,.gh-months{grid-auto-columns:10px;}
-    .gh-cell{width:9px;height:9px;}
+    .ghg-card{padding:1.1rem;}
+    .ghg-img{min-width:520px;}
 }
 @media (max-width:360px){.hero h1{font-size:1.6rem;}.hero h2{font-size:.7rem;}h2{font-size:1.4rem;}.card,.project-card,.exp-node-card{padding:1rem;}}
 @media (min-width:1440px){.container{max-width:1400px;}.cards,.projects-grid{grid-template-columns:repeat(auto-fit,minmax(320px,1fr));}.skills-grid{grid-template-columns:repeat(3,1fr);}.contact-grid{grid-template-columns:repeat(2,1fr);}.contact-item-featured{grid-column:1/-1;}}

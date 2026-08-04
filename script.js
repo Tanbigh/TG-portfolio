@@ -6,6 +6,65 @@ function isTouchDevice() {
 }
 
 // ============================================
+// MAILTO LINKS — "Let's Work Together" button + Email card
+// Forces navigation explicitly via script, on top of the native
+// href, so the mail client opens even if something in the page
+// (extension, overlay, etc.) ever interferes with default anchor
+// behavior. Also shows a copy-to-clipboard fallback toast if no
+// mail client responds, since a blank click is usually caused by
+// the OS/browser having no default mail app registered — not by
+// the code — and the person deserves a way forward either way.
+// ============================================
+(function initMailtoLinks() {
+    const links = document.querySelectorAll('.js-mailto-link');
+    if (!links.length) return;
+
+    function showMailFallback(email) {
+        let toast = document.getElementById('mailFallbackToast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'mailFallbackToast';
+            toast.className = 'resume-toast';
+            toast.setAttribute('role', 'status');
+            toast.setAttribute('aria-live', 'polite');
+            document.body.appendChild(toast);
+        }
+        toast.textContent = `No email app responded — address copied: ${email}`;
+        toast.classList.add('show');
+        clearTimeout(toast._hideTimer);
+        toast._hideTimer = setTimeout(() => toast.classList.remove('show'), 5000);
+        if (navigator.clipboard) navigator.clipboard.writeText(email).catch(() => {});
+    }
+
+    links.forEach(link => {
+        link.addEventListener('click', function (e) {
+            const href = this.getAttribute('href');
+            const label = this.dataset.mailtoLabel || 'mailto link';
+            console.log(`${label} clicked ->`, href);
+            if (!href) return;
+
+            // Let the native <a href="mailto:..."> behavior fire normally.
+            // As a safety net, also force it via script in case anything
+            // ever blocks the default action.
+            window.location.href = href;
+
+            // Heuristic: if the tab is still in the foreground ~1.2s later,
+            // no mail client intercepted the mailto: request (most likely
+            // because no default mail app is registered on this device).
+            // Offer the email address as a copyable fallback so the click
+            // never dead-ends.
+            const email = href.replace('mailto:', '').split('?')[0];
+            const checkTimer = setTimeout(() => {
+                if (document.visibilityState === 'visible') {
+                    showMailFallback(email);
+                }
+            }, 1200);
+            window.addEventListener('blur', () => clearTimeout(checkTimer), { once: true });
+        });
+    });
+})();
+
+// ============================================
 // FIX: ALWAYS START AT TOP ON REFRESH
 // ============================================
 if ('scrollRestoration' in history) history.scrollRestoration = 'manual';

@@ -142,6 +142,33 @@ function isTouchDevice() {
 })();
 
 // ============================================
+// PROJECT PREVIEW SCREENSHOTS — real homepage previews
+// (mshots, generated live from each project's actual URL) with a
+// shimmer skeleton while loading and a graceful icon fallback if a
+// particular screenshot service request ever fails.
+// ============================================
+(function initProjectPreviews() {
+    const imgs = document.querySelectorAll('.project-preview-img');
+    if (!imgs.length) return;
+
+    imgs.forEach(img => {
+        const preview = img.closest('.project-preview');
+
+        img.addEventListener('load', () => {
+            img.classList.add('is-loaded');
+        });
+
+        img.addEventListener('error', () => {
+            if (preview) preview.classList.add('img-error');
+        });
+
+        if (img.complete && img.naturalWidth > 0) {
+            img.classList.add('is-loaded');
+        }
+    });
+})();
+
+// ============================================
 // FIX: ALWAYS START AT TOP ON REFRESH
 // ============================================
 if ('scrollRestoration' in history) history.scrollRestoration = 'manual';

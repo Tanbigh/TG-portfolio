@@ -292,7 +292,9 @@ function hideLoader() {
     loaderDone = true;
     if (loaderRAF) cancelAnimationFrame(loaderRAF);
     if (loadingScreen) loadingScreen.classList.add('hidden');
-    tryAutoPlayMusic();
+    // Background audio is started only after an explicit user click.
+    // Browsers commonly block autoplay, and calling it here ran before the
+    // music controls were initialized, which could stop the rest of this file.
     // Loading screen is decorative chrome — once it's gone, release it from
     // the accessibility tree and stop it from ever intercepting focus/clicks.
     if (loadingScreen) {
@@ -322,7 +324,8 @@ const iconDark  = themeToggle ? themeToggle.querySelector('.theme-icon-dark')  :
 const iconLight = themeToggle ? themeToggle.querySelector('.theme-icon-light') : null;
 
 function getPreferredTheme() {
-    const saved = localStorage.getItem('tg-theme');
+    let saved = null;
+    try { saved = localStorage.getItem('tg-theme'); } catch (_) {}
     if (saved === 'dark' || saved === 'light') return saved;
     return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
 }
@@ -340,7 +343,7 @@ if (themeToggle) {
         // Respect reduced-motion users: skip the flash overlay entirely.
         if (prefersReducedMotion) {
             htmlEl.setAttribute('data-theme', next);
-            localStorage.setItem('tg-theme', next);
+            try { localStorage.setItem('tg-theme', next); } catch (_) {}
             updateThemeIcon(next);
             themeToggle.setAttribute('aria-pressed', next === 'light' ? 'true' : 'false');
             return;
@@ -355,7 +358,7 @@ if (themeToggle) {
             overlay.style.opacity = '1';
             setTimeout(() => {
                 htmlEl.setAttribute('data-theme', next);
-                localStorage.setItem('tg-theme', next);
+                try { localStorage.setItem('tg-theme', next); } catch (_) {}
                 updateThemeIcon(next);
                 themeToggle.setAttribute('aria-pressed', next === 'light' ? 'true' : 'false');
                 overlay.style.opacity = '0';
@@ -374,39 +377,55 @@ function updateThemeIcon(theme) {
 }
 
 // ============================================
-// MUSIC
+// MUSIC — user-initiated playback (browser autoplay-safe)
 // ============================================
 const musicToggle = document.getElementById('musicToggle');
-const bgMusic     = document.getElementById('bgMusic');
-const musicIconOn  = musicToggle ? musicToggle.querySelector('.music-icon-on')  : null;
+const bgMusic = document.getElementById('bgMusic');
+const musicIconOn = musicToggle ? musicToggle.querySelector('.music-icon-on') : null;
 const musicIconOff = musicToggle ? musicToggle.querySelector('.music-icon-off') : null;
 let musicEnabled = false;
 
-function tryAutoPlayMusic() {
-    if (!bgMusic) return;
-    const source = bgMusic.querySelector('source');
-    if (!source || !source.getAttribute('src')) return;
-    bgMusic.volume = 0.18;
-    const p = bgMusic.play();
-    if (p) p.then(() => { musicEnabled = true; updateMusicIcon(true); if (musicToggle) musicToggle.classList.add('active'); }).catch(() => { musicEnabled = false; updateMusicIcon(false); });
+function updateMusicIcon(playing) {
+    if (musicIconOn) musicIconOn.style.display = playing ? 'inline' : 'none';
+    if (musicIconOff) musicIconOff.style.display = playing ? 'none' : 'inline';
+    if (musicToggle) {
+        musicToggle.classList.toggle('active', playing);
+        musicToggle.setAttribute('aria-pressed', playing ? 'true' : 'false');
+        musicToggle.setAttribute('aria-label', playing ? 'Turn background music off' : 'Turn background music on');
+        musicToggle.title = playing ? 'Turn music off' : 'Turn music on';
+    }
 }
-if (musicToggle) {
-    musicToggle.addEventListener('click', () => {
-        if (!bgMusic) return;
-        if (musicEnabled) {
-            bgMusic.pause(); musicEnabled = false; updateMusicIcon(false);
-            musicToggle.classList.remove('active'); musicToggle.setAttribute('aria-pressed','false');
-        } else {
-            bgMusic.volume = 0.18;
-            bgMusic.play().then(() => { musicEnabled = true; updateMusicIcon(true); musicToggle.classList.add('active'); musicToggle.setAttribute('aria-pressed','true'); }).catch(() => {});
+
+if (bgMusic) {
+    bgMusic.volume = 0.18;
+    bgMusic.addEventListener('play', () => { musicEnabled = true; updateMusicIcon(true); });
+    bgMusic.addEventListener('pause', () => { musicEnabled = false; updateMusicIcon(false); });
+    bgMusic.addEventListener('ended', () => { musicEnabled = false; updateMusicIcon(false); });
+    bgMusic.addEventListener('error', () => {
+        musicEnabled = false;
+        updateMusicIcon(false);
+        console.warn('Background music could not be loaded. Check assets/ambient.mp3.');
+    });
+}
+
+if (musicToggle && bgMusic) {
+    musicToggle.addEventListener('click', async () => {
+        if (!bgMusic.paused) {
+            bgMusic.pause();
+            return;
+        }
+        try {
+            bgMusic.currentTime = 0;
+            await bgMusic.play();
+            updateMusicIcon(true);
+        } catch (error) {
+            musicEnabled = false;
+            updateMusicIcon(false);
+            console.warn('Music playback was blocked or the audio file could not be loaded:', error);
         }
     });
 }
-function updateMusicIcon(playing) {
-    if (!musicIconOn || !musicIconOff) return;
-    musicIconOn.style.display  = playing ? 'inline' : 'none';
-    musicIconOff.style.display = playing ? 'none'   : 'inline';
-}
+updateMusicIcon(false);
 
 // ============================================
 // ORCHID ID BUTTON — COPY TO CLIPBOARD
@@ -845,4 +864,35 @@ if (!prefersReducedMotion) {
                 });
         });
     });
+})();
+
+// ============================================
+// BASIC IMAGE / SOURCE PROTECTION DETERRENTS
+// These discourage casual right-click saving and dragging.
+// They cannot prevent screenshots or access through DevTools/network.
+// ============================================
+(function addBasicContentProtection() {
+    // Disable the browser context menu on the page (including images).
+    document.addEventListener('contextmenu', function (event) {
+        event.preventDefault();
+    });
+
+    // Prevent images from being dragged onto the desktop or another tab.
+    document.addEventListener('dragstart', function (event) {
+        if (event.target && event.target.closest && event.target.closest('img')) {
+            event.preventDefault();
+        }
+    });
+
+    // Discourage common keyboard shortcuts for opening DevTools / viewing source.
+    document.addEventListener('keydown', function (event) {
+        const key = (event.key || '').toLowerCase();
+        const blocked = key === 'f12' ||
+            (event.ctrlKey && event.shiftKey && ['i', 'j', 'c'].includes(key)) ||
+            (event.ctrlKey && ['u', 's'].includes(key));
+        if (blocked) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+    }, true);
 })();

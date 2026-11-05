@@ -68,40 +68,34 @@
 <!-- ═══════════════════════════════════════
      LOADING SCREEN
 ═══════════════════════════════════════ -->
-<div aria-label="Loading portfolio" class="loading-screen" id="loadingScreen" role="status">
-<div aria-hidden="true" class="loader-bg-grid"></div>
-<div aria-hidden="true" class="loader-rings">
-<div class="loader-ring r1"></div>
-<div class="loader-ring r2"></div>
-<div class="loader-ring r3"></div>
-</div>
-<div aria-hidden="true" class="loader-meteors">
-<span></span><span></span><span></span><span></span>
-<span></span><span></span><span></span><span></span>
-</div>
-<div class="loader-content">
-<div class="loader-logo-wrap">
-<div aria-hidden="true" class="loader-logo">TG</div>
-<div aria-hidden="true" class="loader-logo-glow"></div>
-</div>
-<div class="loader-bar-wrap">
-<div class="loader-bar" id="loaderBar">
-<div class="loader-bar-shine"></div>
-</div>
-</div>
-<p class="loader-text" id="loaderText">Initializing...</p>
-<div aria-hidden="true" class="loader-dots">
-<span></span><span></span><span></span>
-</div>
-</div>
-<div aria-hidden="true" class="loader-particles">
-<span></span><span></span><span></span><span></span>
-<span></span><span></span><span></span><span></span>
-</div>
-<div aria-hidden="true" class="loader-corner-deco">
-<span class="c1"></span><span class="c2"></span>
-<span class="c3"></span><span class="c4"></span>
-</div>
+<div aria-label="Loading Tanbi Ghosh portfolio" class="loading-screen" id="loadingScreen" role="status">
+  <div class="loader-ambient" aria-hidden="true"></div>
+  <div class="loader-content editorial-loader">
+    <div class="loader-kicker"><span></span> AN INTERACTIVE EXPERIENCE <span></span></div>
+    <div class="loader-art" aria-hidden="true">
+      <svg class="loader-ribbon ribbon-left" viewBox="0 0 300 190" fill="none">
+        <path d="M286 18C220 5 203 42 159 77C113 113 76 143 20 126C-1 119 10 82 39 83C69 84 77 126 54 157C37 181 13 175 8 155" />
+        <path d="M267 35C224 30 203 66 170 94C131 127 93 158 48 145" />
+        <path d="M45 22C68 45 72 64 62 84" />
+      </svg>
+      <div class="loader-title-wrap">
+        <div class="loader-title"><span>PORT</span><span class="title-accent">FOLIO</span></div>
+        <div class="loader-of">A CREATIVE &amp; RESEARCH PORTFOLIO</div>
+        <div class="loader-author">Tanbi Ghosh</div>
+        <div class="loader-star">✦</div>
+      </div>
+      <svg class="loader-ribbon ribbon-right" viewBox="0 0 300 190" fill="none">
+        <path d="M14 18C80 5 97 42 141 77C187 113 224 143 280 126C301 119 290 82 261 83C231 84 223 126 246 157C263 181 287 175 292 155" />
+        <path d="M33 35C76 30 97 66 130 94C169 127 207 158 252 145" />
+        <path d="M255 22C232 45 228 64 238 84" />
+      </svg>
+    </div>
+    <div class="loader-progress-area">
+      <div class="loader-bar-wrap"><div class="loader-bar" id="loaderBar"><div class="loader-bar-shine"></div></div></div>
+      <p class="loader-text" id="loaderText">Initializing...</p>
+    </div>
+  </div>
+  <div class="loader-bottom-note">AI · COMPUTER VISION · CREATIVE TECHNOLOGY</div>
 </div>
 <!-- FLOATING CONTROLS -->
 <div aria-label="Accessibility and preference controls" class="floating-controls" role="group">
@@ -154,8 +148,6 @@
 </div>
 <div class="hero-clean-visual">
 <div class="hero-photo-frame"><img alt="Portrait of Tanbi Ghosh" onerror="this.src='assets/profile.svg'" src="assets/profile.jpeg"/></div>
-<div class="hero-photo-label"><span>01 / PROFILE</span><span>2026 — PRESENT</span></div>
-<div class="hero-side-note">COMPUTER<br/>VISION<br/><b>✳</b> RESEARCH</div>
 </div>
 <a class="scroll-cue" href="#about"><span>SCROLL TO EXPLORE</span><i></i></a>
 </section>
@@ -175,57 +167,70 @@
 <!-- ═══════════════════════════════════════
      ABOUT SECTION
 ═══════════════════════════════════════ -->
-<section aria-labelledby="about-heading" id="about">
+<section aria-labelledby="about-heading" id="about" class="about-editorial-section">
 <div class="container">
-<h2 class="hl-hover" id="about-heading">About Me</h2>
-<div class="card card-static">
-<p>An MCA student at Sister Nivedita University, Kolkata, with a BCA background (CGPA 8.84) and a growing research focus on Artificial Intelligence, Machine Learning, Deep Learning, and Computer Vision. I enjoy connecting technical problem-solving with thoughtful, accessible design.</p>
-<p>My journey includes academic research, technical projects, editorial leadership, internships, and collaborative events. I value curiosity, clear communication, and building technology that can make a meaningful difference.</p>
-<div class="ai-statement">
-<span aria-hidden="true" class="ai-statement-icon">
-<svg fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24" width="20">
-<circle cx="12" cy="12" r="3"></circle>
-<path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"></path>
-</svg>
-</span>
-<p><strong>Currently exploring:</strong> I’m deeply interested in Artificial Intelligence,
+  <div class="about-editorial-heading">
+    <p class="section-eyebrow">A little introduction</p>
+    <h2 class="hl-hover" id="about-heading">About <span>Me</span></h2>
+  </div>
+  <div class="about-editorial-layout">
+    <aside class="about-profile-card" aria-label="Tanbi Ghosh profile photograph">
+      <div class="about-photo-frame">
+        <img src="assets/tanbi-about-portrait.png" alt="Tanbi Ghosh working thoughtfully at a laptop" loading="lazy" draggable="false" oncontextmenu="return false;">
+      </div>
+      <div class="about-profile-caption">
+        <p class="about-hello">Hello, I'm Tanbi.</p>
+        <p class="about-profile-role">MCA Student <span>·</span> AI &amp; Computer Vision Research</p>
+        <div class="about-profile-rule"></div>
+        <p class="about-profile-location"><span aria-hidden="true">⌖</span> Kolkata, West Bengal, India</p>
+        <div class="about-profile-stamp" aria-hidden="true"><span>RESEARCH</span><strong>CURIOUS</strong><span>AI · RESEARCH</span></div>
+      </div>
+    </aside>
+        <div class="education-block" id="education">
+          <h3 class="hl-hover section-subheading">Education</h3>
+          <div class="education-item">
+            <p class="education-degree">Master of Computer Applications (MCA)</p>
+            <p class="education-institute">Sister Nivedita University, Kolkata</p>
+            <p class="education-year">2026 – Present</p>
+          </div>
+          <div class="education-item">
+            <p class="education-degree">Bachelor of Computer Applications (BCA)</p>
+            <p class="education-institute">Institute of Engineering and Management (IEM), Kolkata</p>
+            <p class="education-year">Graduated 2026</p>
+          </div>
+        </div>
+    <div class="about-editorial-copy card card-static">
+      <p>An MCA student at Sister Nivedita University, Kolkata, with a BCA background (CGPA 8.84) and a growing research focus on Artificial Intelligence, Machine Learning, Deep Learning, and Computer Vision. I enjoy connecting technical problem-solving with thoughtful, accessible design.</p>
+      <p>My journey includes academic research, technical projects, editorial leadership, internships, and collaborative events. I value curiosity, clear communication, and building technology that can make a meaningful difference.</p>
+      <div class="ai-statement">
+        <span aria-hidden="true" class="ai-statement-icon">
+          <svg fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewBox="0 0 24 24" width="20">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"></path>
+          </svg>
+        </span>
+        <p><strong>Currently exploring:</strong> I’m deeply interested in Artificial Intelligence,
                     Machine Learning, and Computer Vision. I’m continuously learning modern AI technologies
                     and enjoy building intelligent, accessibility-focused applications — expanding my
                     knowledge through real-world projects, research, and hands-on experimentation.</p>
-</div>
-<div class="education-block" id="education">
-<h3 class="hl-hover section-subheading">Education</h3>
-<div class="education-item">
-<p class="education-degree">Master of Computer Applications (MCA)</p>
-<p class="education-institute">Sister Nivedita University, Kolkata</p>
-<p class="education-year">2026 – Present</p>
-</div>
-<div class="education-item">
-<p class="education-degree">Bachelor of Computer Applications (BCA)</p>
-<p class="education-institute">Institute of Engineering and Management (IEM), Kolkata</p>
-<p class="education-year">Graduated 2026</p>
-</div>
-</div>
-<div class="languages-section">
-<h3 class="hl-hover section-subheading">Languages Known</h3>
-<div class="language-grid">
-<div class="language-item">
-<span class="language-name">Bengali</span>
-<span class="language-level">Native</span>
-</div>
-<div class="language-item">
-<span class="language-name">English</span>
-<span class="language-level">Professional</span>
-</div>
-<div class="language-item">
-<span class="language-name">Hindi</span>
-<span class="language-level">Professional</span>
-</div>
-</div>
-</div>
-</div>
+      </div>
+      <div class="languages-section">
+          <h3 class="hl-hover section-subheading">Languages Known</h3>
+          <div class="language-grid">
+            <div class="language-item"><span class="language-name">Bengali</span><span class="language-level">Native</span></div>
+            <div class="language-item"><span class="language-name">English</span><span class="language-level">Professional</span></div>
+            <div class="language-item"><span class="language-name">Hindi</span><span class="language-level">Professional</span></div>
+          </div>
+      </div>
+    </div>
+  </div>
 </div>
 </section>
+<!-- EDITORIAL ORNAMENT DIVIDER: About ↔ Publications -->
+<div class="editorial-section-divider" aria-hidden="true">
+  <div class="editorial-divider-pattern"></div>
+  <span class="editorial-divider-glow"></span>
+</div>
 <!-- ═══════════════════════════════════════
      PUBLICATIONS & RESEARCH OUTPUT
 ═══════════════════════════════════════ -->
@@ -1027,33 +1032,26 @@
 ═══════════════════════════════════════ -->
 <section aria-labelledby="otw-heading" class="otw-section" id="open-to-work">
 <div class="container">
-<div class="otw-card reveal-init">
-<div aria-hidden="true" class="otw-glow"></div>
-<div aria-hidden="true" class="otw-particles">
-<span></span><span></span><span></span><span></span><span></span><span></span>
-</div>
-<p class="otw-eyebrow">Let’s build something</p>
-<h2 class="hl-hover" id="otw-heading">Open to Work</h2>
-<p class="otw-subtitle">I’m always excited to collaborate on AI, Machine Learning, Computer
-                Vision, Web Development, and Research projects.</p>
-<div class="otw-actions">
-<a aria-label="Email ghosh.tanbi@gmail.com to start a collaboration" class="btn-otw-primary mailto-btn" href="mailto:ghosh.tanbi@gmail.com?subject=Collaboration%20Opportunity&amp;body=Hi%20Tanbi%2C%0D%0A%0D%0AI%20would%20like%20to%20collaborate%20with%20you%20regarding..." id="workTogetherBtn">
-<svg aria-hidden="true" fill="none" height="17" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="17">
-<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-<polyline points="22,6 12,13 2,6"></polyline>
-</svg>
-                    Let’s Work Together
-                </a>
-<a class="btn-otw-secondary ripple-btn resume-download-btn" download="" href="assets/Tanbi_Ghosh_CV.pdf">
-<svg aria-hidden="true" fill="none" height="17" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="17">
-<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-<polyline points="7 10 12 15 17 10"></polyline>
-<line x1="12" x2="12" y1="15" y2="3"></line>
-</svg>
-                    Download Resume
-                </a>
-</div>
-</div>
+  <div class="otw-card reveal-init">
+    <div class="otw-art" aria-hidden="true">
+      <div class="otw-art-orbit"></div>
+      <div class="otw-portrait-frame"><img src="assets/open-to-work-portrait.png" alt="Tanbi Ghosh working at a laptop"></div>
+      <span class="otw-art-star">✦</span>
+    </div>
+    <div class="otw-content">
+      <p class="otw-kicker">OPEN TO OPPORTUNITIES</p>
+      <h2 class="hl-hover" id="otw-heading">Let’s Connect<span class="otw-spark">✦</span></h2>
+      <p class="otw-subtitle">Open to research collaborations, AI &amp; Computer Vision projects, internships, and meaningful opportunities.</p>
+      <div class="otw-contact-lines">
+        <a href="mailto:ghosh.tanbi@gmail.com">ghosh.tanbi@gmail.com</a>
+        <a href="https://www.linkedin.com/" target="_blank" rel="noopener">Connect on LinkedIn ↗</a>
+      </div>
+      <div class="otw-actions">
+        <a aria-label="Email Tanbi Ghosh" class="btn-otw-primary mailto-btn" href="mailto:ghosh.tanbi@gmail.com?subject=Opportunity%20for%20Tanbi%20Ghosh">Let’s Work Together</a>
+        <a class="btn-otw-secondary resume-download-btn" download href="assets/Tanbi_Ghosh_CV.pdf">Download CV ↓</a>
+      </div>
+    </div>
+  </div>
 </div>
 </section>
 </main>
